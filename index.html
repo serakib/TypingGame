@@ -3,17 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CyberType: Neon Defender // Arcade Typing</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <title>CyberType: Neon Protocol // Advanced Arcade Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-deep: #090a10;
-            --panel-bg: rgba(16, 19, 30, 0.75);
-            --neon-cyan: #00f0ff;
+            --bg-base: #06080d;
+            --panel-bg: rgba(12, 16, 26, 0.85);
+            --neon-cyan: #00f3ff;
             --neon-pink: #ff0055;
-            --neon-yellow: #f3e600;
+            --neon-yellow: #fcee0a;
+            --neon-purple: #bd00ff;
             --text-main: #ffffff;
-            --text-muted: #8b9bb4;
+            --text-muted: #7d8fba;
         }
 
         * {
@@ -24,167 +25,284 @@
         }
 
         body {
-            background-color: var(--bg-deep);
+            background-color: var(--bg-base);
             background-image: 
-                radial-gradient(circle at 50% 20%, rgba(0, 240, 255, 0.08) 0%, transparent 40%),
-                radial-gradient(circle at 80% 80%, rgba(255, 0, 85, 0.06) 0%, transparent 40%);
+                radial-gradient(circle at 50% 10%, rgba(0, 243, 255, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 20% 90%, rgba(189, 0, 255, 0.04) 0%, transparent 40%),
+                linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
             color: var(--text-main);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
             height: 100vh;
-            padding: 1.5rem;
+            padding: 1.2rem;
             overflow: hidden;
             user-select: none;
         }
 
-        /* Top HUD Bar */
+        /* Screen Shake Effect Container */
+        .shake-wrapper {
+            width: 100%;
+            max-width: 1000px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        @keyframes screenShake {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            20% { transform: translate(-3px, 3px) rotate(-0.5deg); }
+            40% { transform: translate(3px, -2px) rotate(0.5deg); }
+            60% { transform: translate(-2px, -2px) rotate(-0.3deg); }
+            80% { transform: translate(2px, 2px) rotate(0.3deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
+
+        .shake {
+            animation: screenShake 0.25s ease-in-out;
+        }
+
+        /* Advanced HUD Dashboard */
         header {
             width: 100%;
-            max-width: 900px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             background: var(--panel-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 1rem 1.8rem;
-            border-radius: 14px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 243, 255, 0.15);
+            padding: 0.9rem 1.8rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255,255,255,0.1);
         }
 
-        .logo {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.3rem;
-            font-weight: 900;
-            letter-spacing: 1px;
-            color: var(--text-main);
+        .logo-box {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.8rem;
         }
 
-        .logo span { color: var(--neon-cyan); text-shadow: 0 0 10px rgba(0, 240, 255, 0.5); }
+        .logo-icon {
+            font-size: 1.5rem;
+            filter: drop-shadow(0 0 8px var(--neon-cyan));
+        }
 
-        .hud-stats {
-            display: flex;
-            gap: 2.5rem;
+        .logo-text {
             font-family: 'Orbitron', sans-serif;
-            font-size: 0.9rem;
+            font-size: 1.2rem;
+            font-weight: 900;
+            letter-spacing: 1.5px;
+            color: var(--text-main);
         }
 
-        .hud-item {
+        .logo-text span {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 12px rgba(0, 243, 255, 0.6);
+        }
+
+        .hud-metrics {
+            display: flex;
+            gap: 2rem;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .metric {
             display: flex;
             flex-direction: column;
             align-items: flex-end;
         }
 
-        .hud-item .label {
-            font-size: 0.7rem;
+        .metric-label {
+            font-size: 0.65rem;
             color: var(--text-muted);
             text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .hud-item .value {
-            font-size: 1.2rem;
+        .metric-value {
+            font-size: 1.15rem;
             font-weight: 700;
             color: var(--neon-cyan);
         }
 
-        #lives-val { color: var(--neon-pink); text-shadow: 0 0 10px rgba(255, 0, 85, 0.4); }
+        #metric-lives { color: var(--neon-pink); text-shadow: 0 0 10px rgba(255, 0, 85, 0.5); }
+        #metric-multiplier { color: var(--neon-yellow); text-shadow: 0 0 10px rgba(252, 238, 10, 0.5); }
 
-        /* Game Arena */
-        .arena {
-            width: 100%;
-            max-width: 900px;
-            flex-grow: 1;
-            position: relative;
-            background: rgba(10, 12, 20, 0.5);
-            margin: 1rem 0;
-            border-radius: 14px;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.6);
+        /* Power-Up Status Bar */
+        .powerup-bar {
+            display: flex;
+            gap: 0.8rem;
+            height: 24px;
+            align-items: center;
         }
 
-        /* Falling Enemy Words */
-        .enemy-word {
+        .powerup-pill {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+        .powerup-pill.active {
+            background: rgba(189, 0, 255, 0.2);
+            border-color: var(--neon-purple);
+            color: var(--neon-purple);
+            box-shadow: 0 0 10px rgba(189, 0, 255, 0.4);
+        }
+
+        /* Tactical Game Arena */
+        .arena {
+            width: 100%;
+            flex-grow: 1;
+            position: relative;
+            background: rgba(8, 11, 18, 0.6);
+            margin: 0.8rem 0;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.7);
+        }
+
+        /* Enemy Units */
+        .enemy {
             position: absolute;
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.15rem;
+            font-size: 1.1rem;
             font-weight: 700;
             padding: 0.4rem 0.8rem;
             border-radius: 8px;
-            background: rgba(16, 19, 30, 0.9);
+            background: rgba(14, 19, 32, 0.95);
             border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.5);
             white-space: nowrap;
-            transition: top 0.04s linear, border-color 0.2s, box-shadow 0.2s;
+            transition: top 0.03s linear, border-color 0.2s, box-shadow 0.2s, transform 0.1s;
         }
 
-        .enemy-word.targeted {
+        .enemy.targeted {
             border-color: var(--neon-cyan);
-            box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
-            transform: scale(1.05);
+            box-shadow: 0 0 22px rgba(0, 243, 255, 0.5);
+            transform: scale(1.06);
+            z-index: 10;
         }
 
-        .enemy-word .matched {
+        .enemy.armored {
+            border-color: var(--neon-yellow);
+        }
+        .enemy.armored.targeted {
+            box-shadow: 0 0 22px rgba(252, 238, 10, 0.5);
+        }
+
+        .enemy.glitch {
+            border-color: var(--neon-pink);
+            animation: glitchPulse 0.4s infinite alternate;
+        }
+
+        @keyframes glitchPulse {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(90deg); opacity: 0.85; }
+        }
+
+        .enemy .matched {
             color: var(--neon-cyan);
-            text-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.7);
+        }
+        .enemy.armored .matched {
+            color: var(--neon-yellow);
+            text-shadow: 0 0 10px rgba(252, 238, 10, 0.7);
+        }
+        .enemy.glitch .matched {
+            color: var(--neon-pink);
+            text-shadow: 0 0 10px rgba(255, 0, 85, 0.7);
         }
 
-        .enemy-word .unmatched {
+        .enemy .unmatched {
             color: var(--text-main);
         }
 
-        /* Danger Warning Line at bottom */
-        .danger-line {
+        .shield-badge {
+            font-size: 0.7rem;
+            background: rgba(252, 238, 10, 0.2);
+            color: var(--neon-yellow);
+            padding: 0.1rem 0.3rem;
+            border-radius: 3px;
+            margin-left: 5px;
+        }
+
+        /* Core Breach Warning Line */
+        .breach-line {
             position: absolute;
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 3px;
+            height: 4px;
             background: linear-gradient(90deg, transparent, var(--neon-pink), transparent);
-            box-shadow: 0 0 10px var(--neon-pink);
+            box-shadow: 0 0 15px var(--neon-pink);
         }
 
-        /* Input Deck */
-        .input-deck {
+        /* Floating Score Popups */
+        .score-popup {
+            position: absolute;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 900;
+            color: var(--neon-yellow);
+            text-shadow: 0 0 10px rgba(252, 238, 10, 0.8);
+            pointer-events: none;
+            animation: floatUp 0.6s ease-out forwards;
+            z-index: 20;
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-35px) scale(1.2); }
+        }
+
+        /* Input Deck Console */
+        .input-console {
             width: 100%;
-            max-width: 900px;
             position: relative;
         }
 
         #type-input {
             width: 100%;
             background: var(--panel-bg);
-            backdrop-filter: blur(12px);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            padding: 1.2rem;
+            backdrop-filter: blur(16px);
+            border: 2px solid rgba(0, 243, 255, 0.2);
+            padding: 1.1rem;
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.3rem;
+            font-size: 1.25rem;
             font-weight: 700;
-            letter-spacing: 2px;
+            letter-spacing: 2.5px;
             color: var(--neon-cyan);
-            border-radius: 14px;
+            border-radius: 12px;
             outline: none;
             text-align: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 0 15px rgba(0, 243, 255, 0.05);
             transition: all 0.2s;
         }
 
         #type-input:focus {
             border-color: var(--neon-cyan);
-            box-shadow: 0 0 25px rgba(0, 240, 255, 0.25), 0 10px 30px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.3), 0 10px 30px rgba(0, 0, 0, 0.6);
         }
 
-        /* Modal Overlays */
+        /* Poki-Style Menu Modal */
         #modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(9, 10, 16, 0.85);
-            backdrop-filter: blur(10px);
+            background: rgba(6, 8, 13, 0.88);
+            backdrop-filter: blur(12px);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -192,155 +310,171 @@
         }
 
         .modal-card {
-            background: linear-gradient(145deg, #131722, #0d0f17);
-            padding: 3rem 2.5rem;
+            background: linear-gradient(145deg, #111624, #0b0e17);
+            padding: 2.8rem 2.4rem;
             border-radius: 20px;
             text-align: center;
-            width: 440px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            width: 480px;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.8), 0 0 30px rgba(0, 243, 255, 0.1);
         }
 
         .modal-card h1 {
             font-family: 'Orbitron', sans-serif;
-            font-size: 2rem;
+            font-size: 2.1rem;
             font-weight: 900;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.6rem;
             background: linear-gradient(90deg, var(--neon-cyan), var(--neon-yellow));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 15px rgba(0,243,255,0.4));
         }
 
         .modal-card p {
             color: var(--text-muted);
             font-size: 0.95rem;
-            margin-bottom: 2rem;
-            line-height: 1.5;
+            margin-bottom: 1.8rem;
+            line-height: 1.6;
         }
 
-        .stat-grid {
+        .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 1rem;
             margin-bottom: 2rem;
         }
 
-        .stat-box {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+        .stat-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
             padding: 1rem;
             border-radius: 12px;
             text-align: center;
         }
 
-        .stat-box .s-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.3rem; }
-        .stat-box .s-value { font-family: 'Orbitron', sans-serif; font-size: 1.4rem; font-weight: 700; color: var(--neon-yellow); }
+        .stat-card .s-title { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.4rem; letter-spacing: 1px; }
+        .stat-card .s-val { font-family: 'Orbitron', sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--neon-yellow); }
 
-        .btn-action {
+        .btn-launch {
             width: 100%;
             background: linear-gradient(90deg, var(--neon-cyan), #0088ff);
-            color: #090a10;
+            color: #06080d;
             border: none;
-            padding: 1rem;
+            padding: 1.1rem;
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.1rem;
+            font-size: 1.15rem;
             font-weight: 900;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             border-radius: 12px;
             cursor: pointer;
-            box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+            box-shadow: 0 0 25px rgba(0, 243, 255, 0.5);
             transition: transform 0.15s, box-shadow 0.15s;
         }
 
-        .btn-action:hover {
+        .btn-launch:hover {
             transform: translateY(-2px);
-            box-shadow: 0 0 30px rgba(0, 240, 255, 0.6);
+            box-shadow: 0 0 35px rgba(0, 243, 255, 0.8);
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="logo">⚡ <span>CYBER</span>TYPE</div>
-        <div class="hud-stats">
-            <div class="hud-item">
-                <span class="label">Score</span>
-                <span class="value" id="score-val">0</span>
+    <div class="shake-wrapper" id="shake-container">
+        <header>
+            <div class="logo-box">
+                <div class="logo-icon">⚡</div>
+                <div class="logo-text">CYBER<span>TYPE</span></div>
             </div>
-            <div class="hud-item">
-                <span class="label">Combo</span>
-                <span class="value" id="combo-val">1x</span>
+            <div class="powerup-bar">
+                <div class="powerup-pill" id="pill-freeze">FREEZE [F]</div>
+                <div class="powerup-pill" id="pill-bomb">EMP BOMB [B]</div>
             </div>
-            <div class="hud-item">
-                <span class="label">Shields</span>
-                <span class="value" id="lives-val">♥♥♥</span>
+            <div class="hud-metrics">
+                <div class="metric">
+                    <span class="metric-label">Score</span>
+                    <span class="metric-value" id="val-score">0</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Combo</span>
+                    <span class="metric-value" id="val-multiplier">1x</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Shields</span>
+                    <span class="metric-value" id="val-lives">♥♥♥</span>
+                </div>
             </div>
+        </header>
+
+        <div class="arena" id="arena">
+            <div class="breach-line"></div>
         </div>
-    </header>
 
-    <div class="arena" id="arena">
-        <div class="danger-line"></div>
+        <div class="input-console">
+            <input type="text" id="type-input" placeholder="INITIALIZING INPUT TERMINAL..." autofocus autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        </div>
     </div>
 
-    <div class="input-deck">
-        <input type="text" id="type-input" placeholder="TYPE TO INTERCEPT..." autofocus autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-    </div>
-
-    <!-- Modal Screen -->
+    <!-- Poki-Style Interactive Menu Overlay -->
     <div id="modal-overlay">
         <div class="modal-card">
-            <h1 id="modal-title">CYBERTYPE</h1>
-            <p id="modal-desc">Intercept incoming syntax packets before they breach the core firewall. Maintain uninterrupted streaks for massive score boosts.</p>
+            <h1 id="modal-title">CYBERTYPE // PROTOCOL</h1>
+            <p id="modal-desc">Intercept descending syntax packets before core breach. Conquer armored targets, maintain high combo streaks, and trigger EMP pulses.</p>
             
-            <div class="stat-grid" id="stats-container" style="display: none;">
-                <div class="stat-box">
-                    <div class="s-label">Final Score</div>
-                    <div class="s-value" id="final-score">0</div>
+            <div class="stats-grid" id="stats-display" style="display: none;">
+                <div class="stat-card">
+                    <div class="s-title">Final Score</div>
+                    <div class="s-val" id="res-score">0</div>
                 </div>
-                <div class="stat-box">
-                    <div class="s-label">Best Record</div>
-                    <div class="s-value" id="best-score">0</div>
+                <div class="stat-card">
+                    <div class="s-title">High Score</div>
+                    <div class="s-val" id="res-best">0</div>
                 </div>
             </div>
 
-            <button class="btn-action" id="start-btn">INITIATE GAME</button>
+            <button class="btn-launch" id="launch-btn">ENGAGE PROTOCOL</button>
         </div>
     </div>
 
     <script>
-        const wordPool = [
+        const dictionary = [
             "protocol", "firewall", "matrix", "kernel", "quantum", "vector", "binary", 
             "syntax", "packet", "router", "script", "terminal", "buffer", "runtime", 
             "crypto", "daemon", "proxy", "async", "thread", "network", "firewall",
-            "malware", "system", "firewall", "firewall", "cyber", "glitch", "arcade"
+            "malware", "system", "cyber", "glitch", "arcade", "firewall", "mainframe",
+            "encryption", "bandwidth", "subroutine", "overclock", "firewall", "payload"
         ];
 
         let score = 0;
-        let combo = 1;
+        let multiplier = 1;
         let lives = 3;
-        let gameRunning = false;
-        let activeEnemies = [];
+        let gameActive = false;
+        let enemies = [];
         let targetedEnemy = null;
-        let spawnInterval = null;
-        let gameLoopInterval = null;
-        let spawnRate = 2000;
+        let spawnLoop = null;
+        let tickLoop = null;
+        let spawnSpeed = 1900;
+        let freezeActive = false;
+        let bombAvailable = true;
 
         const arena = document.getElementById('arena');
         const inputField = document.getElementById('type-input');
-        const scoreVal = document.getElementById('score-val');
-        const comboVal = document.getElementById('combo-val');
-        const livesVal = document.getElementById('lives-val');
+        const valScore = document.getElementById('val-score');
+        const valMultiplier = document.getElementById('val-multiplier');
+        const valLives = document.getElementById('val-lives');
         const modalOverlay = document.getElementById('modal-overlay');
         const modalTitle = document.getElementById('modal-title');
         const modalDesc = document.getElementById('modal-desc');
-        const statsContainer = document.getElementById('stats-container');
-        const finalScoreEl = document.getElementById('final-score');
-        const bestScoreEl = document.getElementById('best-score');
-        const startBtn = document.getElementById('start-btn');
+        const statsDisplay = document.getElementById('stats-display');
+        const resScore = document.getElementById('res-score');
+        const resBest = document.getElementById('res-best');
+        const launchBtn = document.getElementById('launch-btn');
+        const shakeContainer = document.getElementById('shake-container');
+        const pillFreeze = document.getElementById('pill-freeze');
+        const pillBomb = document.getElementById('pill-bomb');
 
-        // Web Audio Synthesizer (Zero external file dependencies)
+        // Web Audio API Sound Synthesizer
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playSfx(type) {
+        function playSound(type) {
             try {
                 if (audioCtx.state === 'suspended') audioCtx.resume();
                 const osc = audioCtx.createOscillator();
@@ -348,88 +482,118 @@
                 
                 if (type === 'hit') {
                     osc.type = 'sine';
-                    osc.frequency.setValueAtTime(500, audioCtx.currentTime);
-                    osc.frequency.exponentialRampToValueAtTime(900, audioCtx.currentTime + 0.06);
+                    osc.frequency.setValueAtTime(450, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(850, audioCtx.currentTime + 0.05);
                     gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.06);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
                 } else if (type === 'clear') {
                     osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-                    osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
+                    osc.frequency.setValueAtTime(550, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(1100, audioCtx.currentTime + 0.09);
                     gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.09);
                 } else if (type === 'miss') {
                     osc.type = 'sawtooth';
-                    osc.frequency.setValueAtTime(120, audioCtx.currentTime);
+                    osc.frequency.setValueAtTime(110, audioCtx.currentTime);
                     gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
                     gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
+                } else if (type === 'bomb') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(80, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.3);
+                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
                 }
                 
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
                 osc.start();
-                osc.stop(audioCtx.currentTime + 0.12);
+                osc.stop(audioCtx.currentTime + 0.3);
             } catch(e) {}
         }
 
-        function startGame() {
-            arena.innerHTML = '<div class="danger-line"></div>';
-            activeEnemies = [];
+        function triggerShake() {
+            shakeContainer.classList.add('shake');
+            setTimeout(() => shakeContainer.classList.remove('shake'), 250);
+        }
+
+        function launchGame() {
+            arena.innerHTML = '<div class="breach-line"></div>';
+            enemies = [];
             targetedEnemy = null;
             score = 0;
-            combo = 1;
+            multiplier = 1;
             lives = 3;
-            spawnRate = 2000;
-            gameRunning = true;
+            spawnSpeed = 1900;
+            freezeActive = false;
+            bombAvailable = true;
+            gameActive = true;
 
             modalOverlay.style.display = 'none';
             inputField.value = '';
             inputField.focus();
 
             updateHUD();
+            pillFreeze.classList.remove('active');
+            pillBomb.classList.remove('active');
 
-            spawnInterval = setInterval(spawnEnemy, spawnRate);
-            gameLoopInterval = setInterval(updateGame, 30);
+            spawnLoop = setInterval(spawnEnemy, spawnSpeed);
+            tickLoop = setInterval(gameLoop, 30);
         }
 
         function spawnEnemy() {
-            if (!gameRunning) return;
+            if (!gameActive || freezeActive) return;
 
-            const word = wordPool[Math.floor(Math.random() * wordPool.length)];
-            if (activeEnemies.some(e => e.word === word)) return;
+            const word = dictionary[Math.floor(Math.random() * dictionary.length)];
+            if (enemies.some(e => e.word === word)) return;
+
+            // Determine enemy class configuration
+            let type = 'normal';
+            let shields = 1;
+            const rand = Math.random();
+            if (rand < 0.22) {
+                type = 'armored';
+                shields = 2; // Takes 2 extra typed characters
+            } else if (rand < 0.35) {
+                type = 'glitch';
+            }
 
             const el = document.createElement('div');
-            el.classList.add('enemy-word');
-            el.innerHTML = `<span class="unmatched">${word}</span>`;
-            
-            const maxLeft = arena.clientWidth - 140;
+            el.className = `enemy ${type}`;
+            let displayHTML = `<span class="unmatched">${word}</span>`;
+            if (shields > 1) displayHTML += `<span class="shield-badge">🛡️${shields}</span>`;
+            el.innerHTML = displayHTML;
+
+            const maxLeft = arena.clientWidth - 150;
             const leftPos = Math.max(15, Math.floor(Math.random() * maxLeft));
             el.style.left = leftPos + 'px';
             el.style.top = '0px';
 
             arena.appendChild(el);
 
-            // Scales speed slightly as score increases
-            const speed = 1.0 + (score / 400);
+            const speedMultiplier = type === 'glitch' ? 1.5 : (type === 'armored' ? 0.75 : 1.0);
+            const enemySpeed = (0.9 + (score / 450)) * speedMultiplier;
 
-            activeEnemies.push({
+            enemies.push({
                 word: word,
                 element: el,
                 top: 0,
-                speed: speed
+                speed: enemySpeed,
+                type: type,
+                shields: shields
             });
         }
 
-        function updateGame() {
-            if (!gameRunning) return;
+        function gameLoop() {
+            if (!gameActive) return;
+            if (freezeActive) return;
 
-            for (let i = activeEnemies.length - 1; i >= 0; i--) {
-                let enemy = activeEnemies[i];
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                let enemy = enemies[i];
                 enemy.top += enemy.speed;
                 enemy.element.style.top = enemy.top + 'px';
 
-                // Check breach condition near bottom line
-                if (enemy.top >= arena.clientHeight - 45) {
+                if (enemy.top >= arena.clientHeight - 50) {
                     breachCore(enemy);
                 }
             }
@@ -437,31 +601,55 @@
 
         function breachCore(enemy) {
             arena.removeChild(enemy.element);
-            activeEnemies = activeEnemies.filter(e => e !== enemy);
+            enemies = enemies.filter(e => e !== enemy);
             if (targetedEnemy === enemy) targetedEnemy = null;
 
             lives--;
-            combo = 1;
-            playSfx('miss');
+            multiplier = 1;
+            playSound('miss');
+            triggerShake();
             updateHUD();
 
             if (lives <= 0) {
-                gameOver();
+                endGame();
             }
         }
 
         function updateHUD() {
-            scoreVal.innerText = score;
-            comboVal.innerText = combo + 'x';
-            livesVal.innerText = '♥'.repeat(Math.max(0, lives));
+            valScore.innerText = score;
+            valMultiplier.innerText = multiplier + 'x';
+            valLives.innerText = '♥'.repeat(Math.max(0, lives));
         }
 
+        function spawnPopup(text, x, y) {
+            const p = document.createElement('div');
+            p.className = 'score-popup';
+            p.innerText = text;
+            p.style.left = x + 'px';
+            p.style.top = y + 'px';
+            arena.appendChild(p);
+            setTimeout(() => p.remove(), 600);
+        }
+
+        // Handle Typing Interception
         inputField.addEventListener('input', () => {
-            if (!gameRunning) return;
+            if (!gameActive) return;
             const typedText = inputField.value.trim().toLowerCase();
 
+            // Special ability triggers
+            if (typedText === 'freeze' && !freezeActive) {
+                activateFreeze();
+                inputField.value = '';
+                return;
+            }
+            if (typedText === 'bomb' && bombAvailable) {
+                activateBomb();
+                inputField.value = '';
+                return;
+            }
+
             if (!targetedEnemy) {
-                targetedEnemy = activeEnemies.find(e => e.word.toLowerCase().startsWith(typedText));
+                targetedEnemy = enemies.find(e => e.word.toLowerCase().startsWith(typedText));
                 if (targetedEnemy) {
                     targetedEnemy.element.classList.add('targeted');
                 }
@@ -471,27 +659,41 @@
                 if (targetedEnemy.word.toLowerCase().startsWith(typedText)) {
                     const matchedPart = targetedEnemy.word.substring(0, typedText.length);
                     const unmatchedPart = targetedEnemy.word.substring(typedText.length);
-                    targetedEnemy.element.innerHTML = `<span class="matched">${matchedPart}</span><span class="unmatched">${unmatchedPart}</span>`;
-                    
-                    playSfx('hit');
+                    let inner = `<span class="matched">${matchedPart}</span><span class="unmatched">${unmatchedPart}</span>`;
+                    if (targetedEnemy.shields > 1) inner += `<span class="shield-badge">🛡️${targetedEnemy.shields}</span>`;
+                    targetedEnemy.element.innerHTML = inner;
+
+                    playSound('hit');
 
                     if (typedText === targetedEnemy.word.toLowerCase()) {
-                        score += 15 * combo;
-                        combo++;
+                        if (targetedEnemy.shields > 1) {
+                            targetedEnemy.shields--;
+                            inputField.value = '';
+                            targetedEnemy.element.classList.remove('targeted');
+                            targetedEnemy = modelTargetReset();
+                            return;
+                        }
+
+                        const rect = targetedEnemy.element.getBoundingClientRect();
+                        const arenaRect = arena.getBoundingClientRect();
+                        spawnPopup(`+${10 * multiplier}`, rect.left - arenaRect.left, rect.top - arenaRect.top);
+
+                        score += 12 * multiplier;
+                        multiplier++;
                         inputField.value = '';
                         
                         arena.removeChild(targetedEnemy.element);
-                        activeEnemies = activeEnemies.filter(e => e !== targetedEnemy);
+                        enemies = enemies.filter(e => e !== targetedEnemy);
                         targetedEnemy = null;
-                        playSfx('clear');
+                        playSound('clear');
                         updateHUD();
                     }
                 } else {
-                    combo = 1;
+                    multiplier = 1;
                     if (targetedEnemy) targetedEnemy.element.classList.remove('targeted');
                     targetedEnemy = null;
                     inputField.value = '';
-                    playSfx('miss');
+                    playSound('miss');
                     updateHUD();
                 }
             } else {
@@ -499,26 +701,53 @@
             }
         });
 
-        function gameOver() {
-            gameRunning = false;
-            clearInterval(spawnInterval);
-            clearInterval(gameLoopInterval);
+        function modelTargetReset() { return null; }
 
-            const bestScore = parseInt(localStorage.getItem('cybertype_highscore')) || 0;
-            if (score > bestScore) {
-                localStorage.setItem('cybertype_highscore', score);
+        function activateFreeze() {
+            freezeActive = true;
+            pillFreeze.classList.add('active');
+            setTimeout(() => {
+                freezeActive = false;
+                pillFreeze.classList.remove('active');
+            }, 3500);
+        }
+
+        function activateBomb() {
+            if (!bombAvailable) return;
+            bombAvailable = false;
+            pillBomb.style.opacity = '0.3';
+            playSound('bomb');
+            triggerShake();
+
+            enemies.forEach(e => {
+                if (e.element.parentNode) e.element.remove();
+            });
+            score += enemies.length * 15;
+            enemies = [];
+            targetedEnemy = null;
+            updateHUD();
+        }
+
+        function endGame() {
+            gameActive = false;
+            clearInterval(spawnLoop);
+            clearInterval(tickLoop);
+
+            const highscore = parseInt(localStorage.getItem('cybertype_advanced_pb')) || 0;
+            if (score > highscore) {
+                localStorage.setItem('cybertype_advanced_pb', score);
             }
 
             modalTitle.innerText = "SYSTEM BREACHED";
-            modalDesc.innerText = "Firewall integrity compromised. Too many syntax packets penetrated the core defense.";
-            finalScoreEl.innerText = score;
-            bestScoreEl.innerText = Math.max(score, bestScore);
-            statsContainer.style.display = 'grid';
-            startBtn.innerText = "RE-INITIALIZE";
+            modalDesc.innerText = "Firewall integrity collapsed. Too many syntax threads bypassed the defensive grid.";
+            resScore.innerText = score;
+            resBest.innerText = Math.max(score, highscore);
+            statsDisplay.style.display = 'grid';
+            launchBtn.innerText = "RE-INITIALIZE PROTOCOL";
             modalOverlay.style.display = 'flex';
         }
 
-        startBtn.addEventListener('click', startGame);
+        launchBtn.addEventListener('click', launchGame);
     </script>
 </body>
 </html>
