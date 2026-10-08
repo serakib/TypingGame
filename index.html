@@ -3,27 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TypeFlow Arcade // Defend the Core</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <title>CyberType: Neon Defender // Arcade Typing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0d0f12;
-            --main-color: #f39c12;
-            --accent-color: #e74c3c;
-            --text-color: #ecf0f1;
-            --sub-color: #7f8c8d;
+            --bg-deep: #090a10;
+            --panel-bg: rgba(16, 19, 30, 0.75);
+            --neon-cyan: #00f0ff;
+            --neon-pink: #ff0055;
+            --neon-yellow: #f3e600;
+            --text-main: #ffffff;
+            --text-muted: #8b9bb4;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Roboto Mono', monospace;
+            font-family: 'Inter', sans-serif;
         }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            background-color: var(--bg-deep);
+            background-image: 
+                radial-gradient(circle at 50% 20%, rgba(0, 240, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(255, 0, 85, 0.06) 0%, transparent 40%);
+            color: var(--text-main);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -34,166 +39,280 @@
             user-select: none;
         }
 
-        /* Top HUD */
+        /* Top HUD Bar */
         header {
             width: 100%;
-            max-width: 800px;
+            max-width: 900px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(255, 255, 255, 0.03);
-            padding: 1rem 1.5rem;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 1rem 1.8rem;
+            border-radius: 14px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
         }
 
-        .logo { font-size: 1.2rem; font-weight: 700; color: var(--sub-color); }
-        .logo span { color: var(--main-color); }
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo span { color: var(--neon-cyan); text-shadow: 0 0 10px rgba(0, 240, 255, 0.5); }
 
         .hud-stats {
             display: flex;
-            gap: 2rem;
-            font-size: 1rem;
+            gap: 2.5rem;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
         }
 
-        .hud-item span { color: var(--main-color); font-weight: 700; }
+        .hud-item {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .hud-item .label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .hud-item .value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--neon-cyan);
+        }
+
+        #lives-val { color: var(--neon-pink); text-shadow: 0 0 10px rgba(255, 0, 85, 0.4); }
 
         /* Game Arena */
         .arena {
             width: 100%;
-            max-width: 800px;
+            max-width: 900px;
             flex-grow: 1;
             position: relative;
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(10, 12, 20, 0.5);
             margin: 1rem 0;
-            border-radius: 8px;
+            border-radius: 14px;
             overflow: hidden;
-            border: 1px dashed rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.6);
         }
 
         /* Falling Enemy Words */
         .enemy-word {
             position: absolute;
-            font-size: 1.3rem;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.15rem;
             font-weight: 700;
-            padding: 0.2rem 0.5rem;
-            border-radius: 4px;
-            background: rgba(20, 22, 25, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            background: rgba(16, 19, 30, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.4);
             white-space: nowrap;
-            transition: top 0.05s linear;
+            transition: top 0.04s linear, border-color 0.2s, box-shadow 0.2s;
         }
 
         .enemy-word.targeted {
-            border-color: var(--main-color);
-            box-shadow: 0 0 10px rgba(243, 156, 18, 0.4);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+            transform: scale(1.05);
         }
 
         .enemy-word .matched {
-            color: var(--main-color);
+            color: var(--neon-cyan);
+            text-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
         }
 
         .enemy-word .unmatched {
-            color: var(--text-color);
+            color: var(--text-main);
         }
 
-        /* Input Bar */
-        .input-container {
+        /* Danger Warning Line at bottom */
+        .danger-line {
+            position: absolute;
+            bottom: 0;
+            left: 0;
             width: 100%;
-            max-width: 800px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--neon-pink), transparent);
+            box-shadow: 0 0 10px var(--neon-pink);
+        }
+
+        /* Input Deck */
+        .input-deck {
+            width: 100%;
+            max-width: 900px;
             position: relative;
         }
 
         #type-input {
             width: 100%;
-            background: #161b22;
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
             border: 2px solid rgba(255, 255, 255, 0.1);
-            padding: 1rem;
-            font-size: 1.2rem;
-            color: var(--text-color);
-            border-radius: 8px;
+            padding: 1.2rem;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--neon-cyan);
+            border-radius: 14px;
             outline: none;
             text-align: center;
-            transition: border-color 0.2s;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: all 0.2s;
         }
 
         #type-input:focus {
-            border-color: var(--main-color);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.25), 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
-        /* Game Over / Start Overlay */
+        /* Modal Overlays */
         #modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(13, 15, 18, 0.9);
+            background: rgba(9, 10, 16, 0.85);
+            backdrop-filter: blur(10px);
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 10;
+            z-index: 100;
         }
 
         .modal-card {
-            background: #161b22;
-            padding: 2.5rem;
+            background: linear-gradient(145deg, #131722, #0d0f17);
+            padding: 3rem 2.5rem;
+            border-radius: 20px;
+            text-align: center;
+            width: 440px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+        }
+
+        .modal-card h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-yellow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .modal-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+            line-height: 1.5;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1rem;
             border-radius: 12px;
             text-align: center;
-            width: 400px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
-        .modal-card h1 { font-size: 1.8rem; margin-bottom: 0.5rem; color: var(--main-color); }
-        .modal-card p { color: var(--sub-color); font-size: 0.9rem; margin-bottom: 1.5rem; }
-        
-        .btn {
-            background: var(--main-color);
-            color: #0d0f12;
+        .stat-box .s-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.3rem; }
+        .stat-box .s-value { font-family: 'Orbitron', sans-serif; font-size: 1.4rem; font-weight: 700; color: var(--neon-yellow); }
+
+        .btn-action {
+            width: 100%;
+            background: linear-gradient(90deg, var(--neon-cyan), #0088ff);
+            color: #090a10;
             border: none;
-            padding: 0.8rem 1.5rem;
-            font-size: 1rem;
-            font-weight: 700;
-            border-radius: 6px;
+            padding: 1rem;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            border-radius: 12px;
             cursor: pointer;
-            transition: transform 0.1s, opacity 0.2s;
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+            transition: transform 0.15s, box-shadow 0.15s;
         }
 
-        .btn:hover { opacity: 0.9; transform: scale(1.02); }
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.6);
+        }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo">👾 <span>TypeFlow</span> // Arcade</div>
+        <div class="logo">⚡ <span>CYBER</span>TYPE</div>
         <div class="hud-stats">
-            <div class="hud-item">Score: <span id="score">0</span></div>
-            <div class="hud-item">Combo: <span id="combo">1x</span></div>
-            <div class="hud-item">Lives: <span id="lives">❤️❤️❤️</span></div>
+            <div class="hud-item">
+                <span class="label">Score</span>
+                <span class="value" id="score-val">0</span>
+            </div>
+            <div class="hud-item">
+                <span class="label">Combo</span>
+                <span class="value" id="combo-val">1x</span>
+            </div>
+            <div class="hud-item">
+                <span class="label">Shields</span>
+                <span class="value" id="lives-val">♥♥♥</span>
+            </div>
         </div>
     </header>
 
     <div class="arena" id="arena">
-        <!-- Falling words will spawn here via JS -->
+        <div class="danger-line"></div>
     </div>
 
-    <div class="input-container">
-        <input type="text" id="type-input" placeholder="Type falling words here to destroy them..." autofocus autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+    <div class="input-deck">
+        <input type="text" id="type-input" placeholder="TYPE TO INTERCEPT..." autofocus autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
     </div>
 
-    <!-- Start / Game Over Modal -->
+    <!-- Modal Screen -->
     <div id="modal-overlay">
         <div class="modal-card">
-            <h1 id="modal-title">TypeFlow Arcade</h1>
-            <p id="modal-desc">Type incoming words before they hit the ground! Maintain streaks for score multipliers.</p>
-            <div id="final-stats" style="margin-bottom: 1.5rem; font-size: 0.9rem; color: var(--text-color);"></div>
-            <button class="btn" id="start-btn">Start Game</button>
+            <h1 id="modal-title">CYBERTYPE</h1>
+            <p id="modal-desc">Intercept incoming syntax packets before they breach the core firewall. Maintain uninterrupted streaks for massive score boosts.</p>
+            
+            <div class="stat-grid" id="stats-container" style="display: none;">
+                <div class="stat-box">
+                    <div class="s-label">Final Score</div>
+                    <div class="s-value" id="final-score">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="s-label">Best Record</div>
+                    <div class="s-value" id="best-score">0</div>
+                </div>
+            </div>
+
+            <button class="btn-action" id="start-btn">INITIATE GAME</button>
         </div>
     </div>
 
     <script>
         const wordPool = [
-            "cyber", "matrix", "glitch", "arcade", "kernel", "binary", "system", 
-            "syntax", "packet", "firewall", "router", "script", "terminal", "buffer", 
-            "runtime", "crypto", "quantum", "vector", "thread", "daemon", "proxy"
+            "protocol", "firewall", "matrix", "kernel", "quantum", "vector", "binary", 
+            "syntax", "packet", "router", "script", "terminal", "buffer", "runtime", 
+            "crypto", "daemon", "proxy", "async", "thread", "network", "firewall",
+            "malware", "system", "firewall", "firewall", "cyber", "glitch", "arcade"
         ];
 
         let score = 0;
@@ -204,55 +323,63 @@
         let targetedEnemy = null;
         let spawnInterval = null;
         let gameLoopInterval = null;
-        let spawnSpeed = 2200; // Milliseconds between spawns
+        let spawnRate = 2000;
 
         const arena = document.getElementById('arena');
         const inputField = document.getElementById('type-input');
-        const scoreEl = document.getElementById('score');
-        const comboEl = document.getElementById('combo');
-        const livesEl = document.getElementById('lives');
+        const scoreVal = document.getElementById('score-val');
+        const comboVal = document.getElementById('combo-val');
+        const livesVal = document.getElementById('lives-val');
         const modalOverlay = document.getElementById('modal-overlay');
         const modalTitle = document.getElementById('modal-title');
         const modalDesc = document.getElementById('modal-desc');
-        const finalStats = document.getElementById('final-stats');
+        const statsContainer = document.getElementById('stats-container');
+        const finalScoreEl = document.getElementById('final-score');
+        const bestScoreEl = document.getElementById('best-score');
         const startBtn = document.getElementById('start-btn');
 
-        // Web Audio Effects
+        // Web Audio Synthesizer (Zero external file dependencies)
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playSound(type) {
+        function playSfx(type) {
             try {
                 if (audioCtx.state === 'suspended') audioCtx.resume();
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 
                 if (type === 'hit') {
-                    osc.frequency.setValueAtTime(400, audioCtx.currentTime);
-                    osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.08);
-                    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(500, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(900, audioCtx.currentTime + 0.06);
+                    gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.06);
+                } else if (type === 'clear') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
+                    gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
                 } else if (type === 'miss') {
                     osc.type = 'sawtooth';
                     osc.frequency.setValueAtTime(120, audioCtx.currentTime);
                     gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
                 }
                 
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
                 osc.start();
-                osc.stop(audioCtx.currentTime + 0.15);
+                osc.stop(audioCtx.currentTime + 0.12);
             } catch(e) {}
         }
 
         function startGame() {
-            // Reset state
-            arena.innerHTML = '';
+            arena.innerHTML = '<div class="danger-line"></div>';
             activeEnemies = [];
             targetedEnemy = null;
             score = 0;
             combo = 1;
             lives = 3;
-            spawnSpeed = 2200;
+            spawnRate = 2000;
             gameRunning = true;
 
             modalOverlay.style.display = 'none';
@@ -261,8 +388,7 @@
 
             updateHUD();
 
-            // Start loops
-            spawnInterval = setInterval(spawnEnemy, spawnSpeed);
+            spawnInterval = setInterval(spawnEnemy, spawnRate);
             gameLoopInterval = setInterval(updateGame, 30);
         }
 
@@ -270,27 +396,27 @@
             if (!gameRunning) return;
 
             const word = wordPool[Math.floor(Math.random() * wordPool.length)];
-            // Ensure word isn't already active on screen
             if (activeEnemies.some(e => e.word === word)) return;
 
             const el = document.createElement('div');
             el.classList.add('enemy-word');
             el.innerHTML = `<span class="unmatched">${word}</span>`;
             
-            // Random horizontal position inside arena
-            const maxLeft = arena.clientWidth - 120;
-            const leftPos = Math.max(10, Math.floor(Math.random() * maxLeft));
+            const maxLeft = arena.clientWidth - 140;
+            const leftPos = Math.max(15, Math.floor(Math.random() * maxLeft));
             el.style.left = leftPos + 'px';
             el.style.top = '0px';
 
             arena.appendChild(el);
 
+            // Scales speed slightly as score increases
+            const speed = 1.0 + (score / 400);
+
             activeEnemies.push({
                 word: word,
-                typedIndex: 0,
                 element: el,
                 top: 0,
-                speed: 1.2 + (score / 500) // Gradually speeds up as score increases
+                speed: speed
             });
         }
 
@@ -302,20 +428,21 @@
                 enemy.top += enemy.speed;
                 enemy.element.style.top = enemy.top + 'px';
 
-                // Check if enemy hit the bottom of the arena
-                if (enemy.top >= arena.clientHeight - 40) {
-                    loseLife();
-                    arena.removeChild(enemy.element);
-                    activeEnemies.splice(i, 1);
-                    if (targetedEnemy === enemy) targetedEnemy = null;
+                // Check breach condition near bottom line
+                if (enemy.top >= arena.clientHeight - 45) {
+                    breachCore(enemy);
                 }
             }
         }
 
-        function loseLife() {
+        function breachCore(enemy) {
+            arena.removeChild(enemy.element);
+            activeEnemies = activeEnemies.filter(e => e !== enemy);
+            if (targetedEnemy === enemy) targetedEnemy = null;
+
             lives--;
             combo = 1;
-            playSound('miss');
+            playSfx('miss');
             updateHUD();
 
             if (lives <= 0) {
@@ -324,59 +451,51 @@
         }
 
         function updateHUD() {
-            scoreEl.innerText = score;
-            comboEl.innerText = combo + 'x';
-            livesEl.innerText = '❤️'.repeat(Math.max(0, lives));
+            scoreVal.innerText = score;
+            comboVal.innerText = combo + 'x';
+            livesVal.innerText = '♥'.repeat(Math.max(0, lives));
         }
 
-        // Handle typing input
-        inputField.addEventListener('input', (e) => {
+        inputField.addEventListener('input', () => {
             if (!gameRunning) return;
-            const typedText = inputField.value.trim();
+            const typedText = inputField.value.trim().toLowerCase();
 
-            // If we don't have a targeted word yet, find one that matches the first letter
             if (!targetedEnemy) {
-                targetedEnemy = activeEnemies.find(e => e.word.startsWith(typedText));
+                targetedEnemy = activeEnemies.find(e => e.word.toLowerCase().startsWith(typedText));
                 if (targetedEnemy) {
                     targetedEnemy.element.classList.add('targeted');
                 }
             }
 
             if (targetedEnemy) {
-                // Check if what the user typed matches the start of the targeted word
-                if (targetedEnemy.word.startsWith(typedText)) {
-                    targetedEnemy.typedIndex = typedText.length;
-                    
-                    // Highlight matched vs unmatched letters
+                if (targetedEnemy.word.toLowerCase().startsWith(typedText)) {
                     const matchedPart = targetedEnemy.word.substring(0, typedText.length);
                     const unmatchedPart = targetedEnemy.word.substring(typedText.length);
                     targetedEnemy.element.innerHTML = `<span class="matched">${matchedPart}</span><span class="unmatched">${unmatchedPart}</span>`;
                     
-                    playSound('hit');
+                    playSfx('hit');
 
-                    // Complete word check
-                    if (typedText === targetedEnemy.word) {
-                        score += 10 * combo;
+                    if (typedText === targetedEnemy.word.toLowerCase()) {
+                        score += 15 * combo;
                         combo++;
-                        inputField.value = ''; // Clear input for next word
+                        inputField.value = '';
                         
-                        // Remove enemy from screen
                         arena.removeChild(targetedEnemy.element);
                         activeEnemies = activeEnemies.filter(e => e !== targetedEnemy);
                         targetedEnemy = null;
+                        playSfx('clear');
                         updateHUD();
                     }
                 } else {
-                    // Typo on current target! Reset combo & target
                     combo = 1;
                     if (targetedEnemy) targetedEnemy.element.classList.remove('targeted');
                     targetedEnemy = null;
                     inputField.value = '';
-                    playSound('miss');
+                    playSfx('miss');
                     updateHUD();
                 }
             } else {
-                inputField.value = ''; // Clear unmatched random typing
+                inputField.value = '';
             }
         });
 
@@ -385,20 +504,17 @@
             clearInterval(spawnInterval);
             clearInterval(gameLoopInterval);
 
-            // LocalStorage High Score
-            const bestScore = parseInt(localStorage.getItem('typeflow_arcade_pb')) || 0;
-            let pbText = '';
+            const bestScore = parseInt(localStorage.getItem('cybertype_highscore')) || 0;
             if (score > bestScore) {
-                localStorage.setItem('typeflow_arcade_pb', score);
-                pbText = `<span style="color:var(--main-color);">★ NEW HIGH SCORE: ${score}!</span>`;
-            } else {
-                pbText = `Score: ${score} | High Score: ${bestScore}`;
+                localStorage.setItem('cybertype_highscore', score);
             }
 
-            modalTitle.innerText = "Game Over";
-            modalDesc.innerText = "The system was overrun by untyped errors.";
-            finalStats.innerHTML = pbText;
-            startBtn.innerText = "Play Again";
+            modalTitle.innerText = "SYSTEM BREACHED";
+            modalDesc.innerText = "Firewall integrity compromised. Too many syntax packets penetrated the core defense.";
+            finalScoreEl.innerText = score;
+            bestScoreEl.innerText = Math.max(score, bestScore);
+            statsContainer.style.display = 'grid';
+            startBtn.innerText = "RE-INITIALIZE";
             modalOverlay.style.display = 'flex';
         }
 
