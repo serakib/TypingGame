@@ -3,16 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TypeFlow // Minimalist Speed Test</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <title>TypeFlow Arcade // Defend the Core</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #141619;
-            --text-color: #646669;
-            --sub-color: #8f9398;
-            --main-color: #e2b714;
-            --error-color: #ca4754;
-            --error-extra: #7e2a33;
+            --bg-color: #0d0f12;
+            --main-color: #f39c12;
+            --accent-color: #e74c3c;
+            --text-color: #ecf0f1;
+            --sub-color: #7f8c8d;
         }
 
         * {
@@ -27,585 +26,383 @@
             color: var(--text-color);
             display: flex;
             flex-direction: column;
+            align-items: center;
             justify-content: space-between;
-            align-items: center;
-            min-height: 100vh;
-            padding: 2rem;
-            overflow-x: hidden;
-        }
-
-        header, footer {
-            width: 100%;
-            max-width: 900px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--sub-color);
-            display: flex;
-            align-items: center;
-            gap: 0.5r em;
-        }
-
-        .logo span { color: var(--main-color); }
-
-        /* Modes bar */
-        .modes {
-            background: rgba(255, 255, 255, 0.03);
-            padding: 0.4rem 1rem;
-            border-radius: 6px;
-            display: flex;
-            gap: 1rem;
-            font-size: 0.9rem;
-        }
-
-        .mode-group {
-            display: flex;
-            gap: 0.6rem;
-        }
-
-        .mode-btn {
-            background: none;
-            border: none;
-            color: var(--text-color);
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-
-        .mode-btn:hover, .mode-btn.active {
-            color: var(--main-color);
-        }
-
-        .separator {
-            color: rgba(255, 255, 255, 0.1);
-        }
-
-        /* Main Game Area */
-        .container {
-            width: 100%;
-            max-width: 900px;
-            position: relative;
-        }
-
-        #stats-bar {
-            font-size: 1.8rem;
-            color: var(--main-color);
-            margin-bottom: 1rem;
-            height: 2rem;
-        }
-
-        .word-wrapper {
-            position: relative;
-            font-size: 1.5rem;
-            line-height: 2.4rem;
-            height: 7.2rem;
+            height: 100vh;
+            padding: 1.5rem;
             overflow: hidden;
             user-select: none;
-            outline: none;
         }
 
-        .words {
+        /* Top HUD */
+        header {
+            width: 100%;
+            max-width: 800px;
             display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem 0.6rem;
-            position: relative;
-            top: 0;
-            transition: top 0.15s ease;
-        }
-
-        .word {
-            position: relative;
-            border-bottom: 2px solid transparent;
-        }
-
-        .letter {
-            position: relative;
-            transition: color 0.1s ease;
-        }
-
-        .letter.correct { color: #d1d0c5; }
-        .letter.incorrect { 
-            color: var(--error-color); 
-            border-bottom: 1px solid var(--error-color);
-        }
-        .letter.extra { color: var(--error-extra); }
-
-        /* Smooth Gliding Caret */
-        #cursor {
-            position: absolute;
-            background-color: var(--main-color);
-            width: 2px;
-            height: 1.8rem;
-            top: 0.3rem;
-            transition: left 0.05s ease, top 0.05s ease;
-            animation: blink 1s infinite;
-        }
-
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
-        }
-
-        /* Controls & Reset */
-        .controls {
-            margin-top: 2rem;
-            display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-        }
-
-        .reset-btn {
-            background: none;
-            border: none;
-            color: var(--text-color);
-            cursor: pointer;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
             background: rgba(255, 255, 255, 0.03);
-            transition: all 0.2s;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .reset-btn:hover {
-            color: #d1d0c5;
-            background: rgba(255, 255, 255, 0.07);
-        }
+        .logo { font-size: 1.2rem; font-weight: 700; color: var(--sub-color); }
+        .logo span { color: var(--main-color); }
 
-        /* Results Modal Overlay */
-        #results-modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(20, 22, 25, 0.92);
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-        }
-
-        .results-content {
-            background: #1b1e23;
-            padding: 2.5rem;
-            border-radius: 12px;
-            width: 500px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            text-align: left;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .results-content h2 {
-            color: var(--sub-color);
-            font-size: 1rem;
-            margin-bottom: 1.5rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .main-stats {
+        .hud-stats {
             display: flex;
             gap: 2rem;
-            margin-bottom: 2rem;
+            font-size: 1rem;
         }
 
-        .stat-box .label {
-            font-size: 0.9rem;
-            color: var(--text-color);
+        .hud-item span { color: var(--main-color); font-weight: 700; }
+
+        /* Game Arena */
+        .arena {
+            width: 100%;
+            max-width: 800px;
+            flex-grow: 1;
+            position: relative;
+            background: rgba(0, 0, 0, 0.3);
+            margin: 1rem 0;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px dashed rgba(255, 255, 255, 0.1);
         }
 
-        .stat-box .value {
-            font-size: 3.5rem;
+        /* Falling Enemy Words */
+        .enemy-word {
+            position: absolute;
+            font-size: 1.3rem;
             font-weight: 700;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            background: rgba(20, 22, 25, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            white-space: nowrap;
+            transition: top 0.05s linear;
+        }
+
+        .enemy-word.targeted {
+            border-color: var(--main-color);
+            box-shadow: 0 0 10px rgba(243, 156, 18, 0.4);
+        }
+
+        .enemy-word .matched {
             color: var(--main-color);
         }
 
-        .sub-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            margin-bottom: 2rem;
-            font-size: 0.85rem;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            padding: 1rem 0;
-        }
-
-        .sub-stat-item span {
-            display: block;
-            font-weight: 700;
-            color: #d1d0c5;
-            font-size: 1.1rem;
-        }
-
-        .restart-prompt {
-            text-align: center;
-            font-size: 0.85rem;
-            color: var(--sub-color);
-        }
-
-        footer {
-            font-size: 0.8rem;
+        .enemy-word .unmatched {
             color: var(--text-color);
         }
+
+        /* Input Bar */
+        .input-container {
+            width: 100%;
+            max-width: 800px;
+            position: relative;
+        }
+
+        #type-input {
+            width: 100%;
+            background: #161b22;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            font-size: 1.2rem;
+            color: var(--text-color);
+            border-radius: 8px;
+            outline: none;
+            text-align: center;
+            transition: border-color 0.2s;
+        }
+
+        #type-input:focus {
+            border-color: var(--main-color);
+        }
+
+        /* Game Over / Start Overlay */
+        #modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(13, 15, 18, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .modal-card {
+            background: #161b22;
+            padding: 2.5rem;
+            border-radius: 12px;
+            text-align: center;
+            width: 400px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .modal-card h1 { font-size: 1.8rem; margin-bottom: 0.5rem; color: var(--main-color); }
+        .modal-card p { color: var(--sub-color); font-size: 0.9rem; margin-bottom: 1.5rem; }
+        
+        .btn {
+            background: var(--main-color);
+            color: #0d0f12;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.1s, opacity 0.2s;
+        }
+
+        .btn:hover { opacity: 0.9; transform: scale(1.02); }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo">⚡ <span>Type</span>Flow</div>
-        <div class="modes">
-            <div class="mode-group" id="mode-type">
-                <button class="mode-btn active" data-mode="time" data-val="15">15</button>
-                <button class="mode-btn" data-mode="time" data-val="30">30</button>
-                <button class="mode-btn" data-mode="time" data-val="60">60</button>
-            </div>
-            <div class="separator">/</div>
-            <div class="mode-group" id="mode-count">
-                <button class="mode-btn" data-mode="words" data-val="10">10w</button>
-                <button class="mode-btn" data-mode="words" data-val="25">25w</button>
-            </div>
+        <div class="logo">👾 <span>TypeFlow</span> // Arcade</div>
+        <div class="hud-stats">
+            <div class="hud-item">Score: <span id="score">0</span></div>
+            <div class="hud-item">Combo: <span id="combo">1x</span></div>
+            <div class="hud-item">Lives: <span id="lives">❤️❤️❤️</span></div>
         </div>
     </header>
 
-    <div class="container">
-        <div id="stats-bar">30</div>
-        <div class="word-wrapper" id="word-wrapper" tabindex="0">
-            <div id="cursor"></div>
-            <div class="words" id="words"></div>
-        </div>
-        
-        <div class="controls">
-            <button class="reset-btn" id="reset-btn">
-                ↻ Reset Test
-            </button>
-        </div>
+    <div class="arena" id="arena">
+        <!-- Falling words will spawn here via JS -->
     </div>
 
-    <!-- Results Modal -->
-    <div id="results-modal">
-        <div class="results-content">
-            <h2>Test Results <span id="pb-badge" style="color:var(--main-color); float:right;"></span></h2>
-            <div class="main-stats">
-                <div class="stat-box">
-                    <div class="label">wpm</div>
-                    <div class="value" id="res-wpm">0</div>
-                </div>
-                <div class="stat-box">
-                    <div class="label">acc</div>
-                    <div class="value" id="res-acc" style="color: #d1d0c5;">0%</div>
-                </div>
-            </div>
-            <div class="sub-stats">
-                <div class="sub-stat-item">characters <span id="res-chars">0/0/0/0</span></div>
-                <div class="sub-stat-item">time <span id="res-time">0s</span></div>
-                <div class="sub-stat-item">mode <span id="res-mode">30s</span></div>
-            </div>
-            <div class="restart-prompt">Press <b>Enter</b> or click anywhere to restart</div>
-        </div>
+    <div class="input-container">
+        <input type="text" id="type-input" placeholder="Type falling words here to destroy them..." autofocus autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
     </div>
 
-    <footer>
-        <div>Press <kbd>Tab</kbd> + <kbd>Enter</kbd> or click reset anytime.</div>
-        <div id="high-score-display">PB: 0 WPM</div>
-    </footer>
+    <!-- Start / Game Over Modal -->
+    <div id="modal-overlay">
+        <div class="modal-card">
+            <h1 id="modal-title">TypeFlow Arcade</h1>
+            <p id="modal-desc">Type incoming words before they hit the ground! Maintain streaks for score multipliers.</p>
+            <div id="final-stats" style="margin-bottom: 1.5rem; font-size: 0.9rem; color: var(--text-color);"></div>
+            <button class="btn" id="start-btn">Start Game</button>
+        </div>
+    </div>
 
     <script>
         const wordPool = [
-            "frontend", "developer", "from", "their", "system", "framework", "function", 
-            "browser", "backend", "code", "script", "design", "layout", "element", 
-            "variable", "constant", "async", "promise", "network", "client", "server",
-            "storage", "database", "query", "interface", "package", "module", "router"
+            "cyber", "matrix", "glitch", "arcade", "kernel", "binary", "system", 
+            "syntax", "packet", "firewall", "router", "script", "terminal", "buffer", 
+            "runtime", "crypto", "quantum", "vector", "thread", "daemon", "proxy"
         ];
 
-        let modeType = 'time'; // 'time' or 'words'
-        let modeValue = 30;
-        
-        let wordsList = [];
-        let wordIndex = 0;
-        let letterIndex = 0;
-        let timer = null;
-        let timeLeft = 30;
-        let timeElapsed = 0;
-        let isPlaying = false;
-        let isFinished = false;
+        let score = 0;
+        let combo = 1;
+        let lives = 3;
+        let gameRunning = false;
+        let activeEnemies = [];
+        let targetedEnemy = null;
+        let spawnInterval = null;
+        let gameLoopInterval = null;
+        let spawnSpeed = 2200; // Milliseconds between spawns
 
-        let correctCharsCount = 0;
-        let incorrectCharsCount = 0;
-        let extraCharsCount = 0;
-        let missedCharsCount = 0;
-        let totalTypedCount = 0;
+        const arena = document.getElementById('arena');
+        const inputField = document.getElementById('type-input');
+        const scoreEl = document.getElementById('score');
+        const comboEl = document.getElementById('combo');
+        const livesEl = document.getElementById('lives');
+        const modalOverlay = document.getElementById('modal-overlay');
+        const modalTitle = document.getElementById('modal-title');
+        const modalDesc = document.getElementById('modal-desc');
+        const finalStats = document.getElementById('final-stats');
+        const startBtn = document.getElementById('start-btn');
 
-        const wordsContainer = document.getElementById('words');
-        const statsBar = document.getElementById('stats-bar');
-        const cursor = document.getElementById('cursor');
-        const wrapper = document.getElementById('word-wrapper');
-        const resetBtn = document.getElementById('reset-btn');
-        const resultsModal = document.getElementById('results-modal');
-        const highScoreDisplay = document.getElementById('high-score-display');
-
-        // Web Audio API Audio Clicks
+        // Web Audio Effects
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playClick(isError = false) {
+        function playSound(type) {
             try {
                 if (audioCtx.state === 'suspended') audioCtx.resume();
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
-                osc.type = isError ? 'sawtooth' : 'sine';
-                osc.frequency.setValueAtTime(isError ? 100 : 700, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.04);
+                
+                if (type === 'hit') {
+                    osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.08);
+                    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+                } else if (type === 'miss') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(120, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+                }
+                
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
                 osc.start();
-                osc.stop(audioCtx.currentTime + 0.04);
+                osc.stop(audioCtx.currentTime + 0.15);
             } catch(e) {}
         }
 
-        function initGame() {
-            clearInterval(timer);
-            isPlaying = false;
-            isFinished = false;
-            wordIndex = 0;
-            letterIndex = 0;
-            timeElapsed = 0;
-            correctCharsCount = 0;
-            incorrectCharsCount = 0;
-            extraCharsCount = 0;
-            missedCharsCount = 0;
-            totalTypedCount = 0;
-            
-            timeLeft = modeType === 'time' ? modeValue : 0;
-            statsBar.innerText = modeType === 'time' ? timeLeft : modeValue;
-            resultsModal.style.display = 'none';
+        function startGame() {
+            // Reset state
+            arena.innerHTML = '';
+            activeEnemies = [];
+            targetedEnemy = null;
+            score = 0;
+            combo = 1;
+            lives = 3;
+            spawnSpeed = 2200;
+            gameRunning = true;
 
-            // Generate words
-            wordsList = [];
-            const count = modeType === 'words' ? modeValue : 40;
-            for (let i = 0; i < count; i++) {
-                const randWord = wordPool[Math.floor(Math.random() * wordPool.length)];
-                wordsList.push(randWord);
-            }
+            modalOverlay.style.display = 'none';
+            inputField.value = '';
+            inputField.focus();
 
-            renderWords();
-            updateCursorPosition();
-            wrapper.focus();
-            updateHighScoreDisplay();
+            updateHUD();
+
+            // Start loops
+            spawnInterval = setInterval(spawnEnemy, spawnSpeed);
+            gameLoopInterval = setInterval(updateGame, 30);
         }
 
-        function renderWords() {
-            wordsContainer.innerHTML = '';
-            wordsList.forEach((word) => {
-                const wordSpan = document.createElement('div');
-                wordSpan.classList.add('word');
-                for (let char of word) {
-                    const letterSpan = document.createElement('span');
-                    letterSpan.classList.add('letter');
-                    letterSpan.innerText = char;
-                    wordSpan.appendChild(letterSpan);
-                }
-                wordsContainer.appendChild(wordSpan);
+        function spawnEnemy() {
+            if (!gameRunning) return;
+
+            const word = wordPool[Math.floor(Math.random() * wordPool.length)];
+            // Ensure word isn't already active on screen
+            if (activeEnemies.some(e => e.word === word)) return;
+
+            const el = document.createElement('div');
+            el.classList.add('enemy-word');
+            el.innerHTML = `<span class="unmatched">${word}</span>`;
+            
+            // Random horizontal position inside arena
+            const maxLeft = arena.clientWidth - 120;
+            const leftPos = Math.max(10, Math.floor(Math.random() * maxLeft));
+            el.style.left = leftPos + 'px';
+            el.style.top = '0px';
+
+            arena.appendChild(el);
+
+            activeEnemies.push({
+                word: word,
+                typedIndex: 0,
+                element: el,
+                top: 0,
+                speed: 1.2 + (score / 500) // Gradually speeds up as score increases
             });
         }
 
-        function updateCursorPosition() {
-            const currentWordEl = wordsContainer.children[wordIndex];
-            if (!currentWordEl) return;
-            
-            if (letterIndex < currentWordEl.children.length) {
-                const currentLetterEl = currentWordEl.children[letterIndex];
-                cursor.style.left = currentLetterEl.offsetLeft + 'px';
-                cursor.style.top = currentWordEl.offsetTop + 'px';
-            } else {
-                const lastLetterEl = currentWordEl.children[currentWordEl.children.length - 1];
-                cursor.style.left = (lastLetterEl.offsetLeft + lastLetterEl.offsetWidth) + 'px';
-                cursor.style.top = currentWordEl.offsetTop + 'px';
+        function updateGame() {
+            if (!gameRunning) return;
+
+            for (let i = activeEnemies.length - 1; i >= 0; i--) {
+                let enemy = activeEnemies[i];
+                enemy.top += enemy.speed;
+                enemy.element.style.top = enemy.top + 'px';
+
+                // Check if enemy hit the bottom of the arena
+                if (enemy.top >= arena.clientHeight - 40) {
+                    loseLife();
+                    arena.removeChild(enemy.element);
+                    activeEnemies.splice(i, 1);
+                    if (targetedEnemy === enemy) targetedEnemy = null;
+                }
             }
         }
 
-        // Mode Switching
-        document.querySelectorAll('.mode-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active');
-                modeType = e.target.dataset.mode;
-                modeValue = parseInt(e.target.dataset.val);
-                initGame();
-            });
-        });
+        function loseLife() {
+            lives--;
+            combo = 1;
+            playSound('miss');
+            updateHUD();
 
-        wrapper.addEventListener('click', () => wrapper.focus());
+            if (lives <= 0) {
+                gameOver();
+            }
+        }
 
-        // Key Handling
-        wrapper.addEventListener('keydown', (e) => {
-            if (isFinished) {
-                if (e.key === 'Enter') initGame();
-                return;
+        function updateHUD() {
+            scoreEl.innerText = score;
+            comboEl.innerText = combo + 'x';
+            livesEl.innerText = '❤️'.repeat(Math.max(0, lives));
+        }
+
+        // Handle typing input
+        inputField.addEventListener('input', (e) => {
+            if (!gameRunning) return;
+            const typedText = inputField.value.trim();
+
+            // If we don't have a targeted word yet, find one that matches the first letter
+            if (!targetedEnemy) {
+                targetedEnemy = activeEnemies.find(e => e.word.startsWith(typedText));
+                if (targetedEnemy) {
+                    targetedEnemy.element.classList.add('targeted');
+                }
             }
 
-            if (!isPlaying && e.key.length === 1 && e.key !== ' ') {
-                isPlaying = true;
-                startTimer();
-            }
+            if (targetedEnemy) {
+                // Check if what the user typed matches the start of the targeted word
+                if (targetedEnemy.word.startsWith(typedText)) {
+                    targetedEnemy.typedIndex = typedText.length;
+                    
+                    // Highlight matched vs unmatched letters
+                    const matchedPart = targetedEnemy.word.substring(0, typedText.length);
+                    const unmatchedPart = targetedEnemy.word.substring(typedText.length);
+                    targetedEnemy.element.innerHTML = `<span class="matched">${matchedPart}</span><span class="unmatched">${unmatchedPart}</span>`;
+                    
+                    playSound('hit');
 
-            const currentWordEl = wordsContainer.children[wordIndex];
-            if (!currentWordEl) return;
-
-            if (e.key === 'Backspace') {
-                playClick();
-                if (letterIndex > 0) {
-                    letterIndex--;
-                    const letterEl = currentWordEl.children[letterIndex];
-                    letterEl.classList.remove('correct', 'incorrect');
-                    if (letterEl.classList.contains('extra')) {
-                        letterEl.remove();
+                    // Complete word check
+                    if (typedText === targetedEnemy.word) {
+                        score += 10 * combo;
+                        combo++;
+                        inputField.value = ''; // Clear input for next word
+                        
+                        // Remove enemy from screen
+                        arena.removeChild(targetedEnemy.element);
+                        activeEnemies = activeEnemies.filter(e => e !== targetedEnemy);
+                        targetedEnemy = null;
+                        updateHUD();
                     }
-                } else if (wordIndex > 0) {
-                    wordIndex--;
-                    letterIndex = wordsContainer.children[wordIndex].children.length;
-                }
-                updateCursorPosition();
-                e.preventDefault();
-            } 
-            else if (e.key === ' ') {
-                e.preventDefault();
-                if (letterIndex === 0 && wordIndex === 0) return; // Ignore leading spaces
-                
-                // Count unwritten letters as missed
-                for (let i = letterIndex; i < currentWordEl.children.length; i++) {
-                    missedCharsCount++;
-                }
-
-                wordIndex++;
-                letterIndex = 0;
-
-                // Auto generate more words if running low in time mode
-                if (wordIndex >= wordsList.length - 5 && modeType === 'time') {
-                    for (let i = 0; i < 20; i++) {
-                        const randWord = wordPool[Math.floor(Math.random() * wordPool.length)];
-                        wordsList.push(randWord);
-                        const wordSpan = document.createElement('div');
-                        wordSpan.classList.add('word');
-                        for (let char of randWord) {
-                            const lSpan = document.createElement('span');
-                            lSpan.classList.add('letter');
-                            lSpan.innerText = char;
-                            wordSpan.appendChild(lSpan);
-                        }
-                        wordsContainer.appendChild(wordSpan);
-                    }
-                }
-
-                // Check finish condition for words mode
-                if (modeType === 'words' && wordIndex >= modeValue) {
-                    finishGame();
-                    return;
-                }
-
-                updateCursorPosition();
-                // Scroll container view if needed
-                if (currentWordEl.offsetTop > 40) {
-                    wordsContainer.style.top = `-${currentWordEl.offsetTop}px`;
-                }
-            } 
-            else if (e.key.length === 1) {
-                totalTypedCount++;
-                const expectedLetters = currentWordEl.children;
-
-                if (letterIndex < expectedLetters.length) {
-                    const letterEl = expectedLetters[letterIndex];
-                    if (e.key === letterEl.innerText) {
-                        letterEl.classList.add('correct');
-                        correctCharsCount++;
-                        playClick(false);
-                    } else {
-                        letterEl.classList.add('incorrect');
-                        incorrectCharsCount++;
-                        playClick(true);
-                    }
-                    letterIndex++;
                 } else {
-                    // Extra characters typed past word limit
-                    const extraSpan = document.createElement('span');
-                    extraSpan.classList.add('letter', 'extra');
-                    extraSpan.innerText = e.key;
-                    currentWordEl.appendChild(extraSpan);
-                    extraCharsCount++;
-                    letterIndex++;
-                    playClick(true);
+                    // Typo on current target! Reset combo & target
+                    combo = 1;
+                    if (targetedEnemy) targetedEnemy.element.classList.remove('targeted');
+                    targetedEnemy = null;
+                    inputField.value = '';
+                    playSound('miss');
+                    updateHUD();
                 }
-                updateCursorPosition();
+            } else {
+                inputField.value = ''; // Clear unmatched random typing
             }
         });
 
-        function startTimer() {
-            const startTime = Date.now();
-            timer = setInterval(() => {
-                const elapsedSec = Math.floor((Date.now() - startTime) / 1000);
-                timeElapsed = elapsedSec;
+        function gameOver() {
+            gameRunning = false;
+            clearInterval(spawnInterval);
+            clearInterval(gameLoopInterval);
 
-                if (modeType === 'time') {
-                    timeLeft = modeValue - elapsedSec;
-                    statsBar.innerText = timeLeft > 0 ? timeLeft : 0;
-                    if (timeLeft <= 0) {
-                        clearInterval(timer);
-                        finishGame();
-                    }
-                } else {
-                    statsBar.innerText = elapsedSec;
-                }
-            }, 1000);
-        }
-
-        function finishGame() {
-            isFinished = true;
-            clearInterval(timer);
-
-            const finalTime = modeType === 'time' ? modeValue : (timeElapsed || 1);
-            const minutes = finalTime / 60;
-            const grossWpm = Math.round((totalTypedCount / 5) / minutes);
-            const netWpm = Math.max(0, Math.round(((correctCharsCount) / 5) / minutes));
-            const totalAttempts = correctCharsCount + incorrectCharsCount;
-            const accuracy = totalAttempts > 0 ? Math.round((correctCharsCount / totalAttempts) * 100) : 0;
-
-            // Display results in modal
-            document.getElementById('res-wpm').innerText = netWpm;
-            document.getElementById('res-acc').innerText = accuracy + '%';
-            document.getElementById('res-chars').innerText = `${correctCharsCount}/${incorrectCharsCount}/${extraCharsCount}/${missedCharsCount}`;
-            document.getElementById('res-time').innerText = finalTime + 's';
-            document.getElementById('res-mode').innerText = modeType === 'time' ? `${modeValue}s` : `${modeValue}w`;
-
-            // LocalStorage High Score Check
-            const storageKey = `typeflow_pb_${modeType}_${modeValue}`;
-            const currentPB = parseInt(localStorage.getItem(storageKey)) || 0;
-            const badge = document.getElementById('pb-badge');
-
-            if (netWpm > currentPB) {
-                localStorage.setItem(storageKey, netWpm);
-                badge.innerText = '★ NEW PB!';
+            // LocalStorage High Score
+            const bestScore = parseInt(localStorage.getItem('typeflow_arcade_pb')) || 0;
+            let pbText = '';
+            if (score > bestScore) {
+                localStorage.setItem('typeflow_arcade_pb', score);
+                pbText = `<span style="color:var(--main-color);">★ NEW HIGH SCORE: ${score}!</span>`;
             } else {
-                badge.innerText = `PB: ${currentPB}`;
+                pbText = `Score: ${score} | High Score: ${bestScore}`;
             }
 
-            resultsModal.style.display = 'flex';
-            updateHighScoreDisplay();
+            modalTitle.innerText = "Game Over";
+            modalDesc.innerText = "The system was overrun by untyped errors.";
+            finalStats.innerHTML = pbText;
+            startBtn.innerText = "Play Again";
+            modalOverlay.style.display = 'flex';
         }
 
-        function updateHighScoreDisplay() {
-            const storageKey = `typeflow_pb_${modeType}_${modeValue}`;
-            const pb = localStorage.getItem(storageKey) || 0;
-            highScoreDisplay.innerText = `PB (${modeType === 'time' ? modeValue + 's' : modeValue + 'w'}): ${pb} WPM`;
-        }
-
-        resetBtn.addEventListener('click', initGame);
-        resultsModal.addEventListener('click', initGame);
-
-        // Initial setup
-        initGame();
+        startBtn.addEventListener('click', startGame);
     </script>
 </body>
 </html>
