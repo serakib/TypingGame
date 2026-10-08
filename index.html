@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TypeFlow Pro - Advanced Typing Test</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --accent: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.2);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --error: #f43f5e;
+            --success: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--accent);
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .mode-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 6px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .mode-btn.active {
+            background: var(--accent);
+            color: var(--bg-main);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .typing-arena {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        #word-display {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 22px;
+            line-height: 1.8;
+            color: var(--text-muted);
+            height: 120px;
+            overflow: hidden;
+            user-select: none;
+            position: relative;
+        }
+
+        /* Span styling for letter-by-letter accuracy checking */
+        #word-display span {
+            position: relative;
+        }
+
+        #word-display span.correct {
+            color: var(--text-main);
+        }
+
+        #word-display span.incorrect {
+            color: var(--error);
+            background: rgba(244, 63, 94, 0.15);
+            border-radius: 2px;
+        }
+
+        #word-display span.current {
+            border-bottom: 2px solid var(--accent);
+        }
+
+        /* Hidden real-input element that catches actual keystrokes */
+        .hidden-input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .restart-container {
+            display: flex;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: var(--bg-main);
+            border: none;
+            padding: 12px 28px;
+            font-size: 15px;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.1s ease, box-shadow 0.2s ease;
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px var(--accent-glow);
+        }
+
+        .overlay-message {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(4px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            z-index: 10;
+            transition: opacity 0.3s ease;
+        }
+
+        .overlay-message.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .overlay-message h2 {
+            font-size: 26px;
+            margin-bottom: 8px;
+        }
+
+        .overlay-message p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header>
+        <h1>⚡ TypeFlow Pro</h1>
+        <div class="mode-selector">
+            <button class="mode-btn active" onclick="setDuration(15)">15s</button>
+            <button class="mode-btn" onclick="setDuration(30)">30s</button>
+            <button class="mode-btn" onclick="setDuration(60)">60s</button>
+        </div>
+    </header>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">WPM</div>
+            <div class="stat-value" id="wpm">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Accuracy</div>
+            <div class="stat-value" id="accuracy">100%</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Time Left</div>
+            <div class="stat-value" id="timer">30</div>
+        </div>
+    </div>
+
+    <div class="typing-arena" onclick="focusInput()">
+        <div id="word-display"></div>
+        <input type="text" id="real-input" class="hidden-input" autocomplete="off" autocapitalize="off" spellcheck="false">
+        
+        <div id="start-overlay" class="overlay-message">
+            <h2>Ready to Type?</h2>
+            <p>Click anywhere or press start to begin the session</p>
+            <button class="btn-primary" onclick="startGame()">Start Test</button>
+        </div>
+
+        <div id="results-overlay" class="overlay-message hidden">
+            <h2>Session Complete</h2>
+            <p id="final-stats-text">Here is how you performed.</p>
+            <button class="btn-primary" onclick="resetGame()">Try Again</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const wordList = [
+        "code", "javascript", "browser", "keyboard", "speed", "challenge", "developer", 
+        "function", "variable", "network", "laptop", "screen", "monitor", "system", 
+        "program", "internet", "gaming", "stream", "design", "hosting", "algorithm", 
+        "backend", "frontend", "framework", "database", "syntax", "compile", "async", 
+        "promise", "object", "array", "string", "boolean", "integer", "debugging"
+    ];
+
+    let testDuration = 30;
+    let timeLeft = testDuration;
+    let timerInterval = null;
+    let isPlaying = false;
+    let charIndex = 0;
+    let mistakes = 0;
+    let typedCharacters = 0;
+    let generatedText = "";
+
+    const wordDisplay = document.getElementById('word-display');
+    const realInput = document.getElementById('real-input');
+    const timerDisplay = document.getElementById('timer');
+    const wpmDisplay = document.getElementById('wpm');
+    const accuracyDisplay = document.getElementById('accuracy');
+    const startOverlay = document.getElementById('start-overlay');
+    const resultsOverlay = document.getElementById('results-overlay');
+    const finalStatsText = document.getElementById('final-stats-text');
+
+    function setDuration(seconds) {
+        if (isPlaying) return;
+        testDuration = seconds;
+        timeLeft = seconds;
+        timerDisplay.textContent = timeLeft;
+        
+        document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+    }
+
+    function initText() {
+        // Shuffle and generate a continuous string of words separated by spaces
+        let shuffled = [...wordList].sort(() => Math.random() - 0.5);
+        generatedText = shuffled.join(" ") + " ";
+        
+        wordDisplay.innerHTML = "";
+        generatedText.split("").forEach(char => {
+            let span = document.createElement('span');
+            span.textContent = char;
+            wordDisplay.appendChild(span);
+        });
+        
+        highlightCurrent();
+    }
+
+    function highlightCurrent() {
+        const spans = wordDisplay.querySelectorAll('span');
+        spans.forEach((span, index) => {
+            span.classList.remove('current');
+            if (index === charIndex) {
+                span.classList.add('current');
+            }
+        });
+    }
+
+    function startGame() {
+        startOverlay.classList.add('hidden');
+        resultsOverlay.classList.add('hidden');
+        isPlaying = true;
+        charIndex = 0;
+        mistakes = 0;
+        typedCharacters = 0;
+        timeLeft = testDuration;
+        timerDisplay.textContent = timeLeft;
+        wpmDisplay.textContent = '0';
+        accuracyDisplay.textContent = '100%';
+
+        initText();
+        realInput.value = '';
+        realInput.focus();
+
+        timerInterval = setInterval(updateTimer, 1000);
+    }
+
+    function focusInput() {
+        if (isPlaying) {
+            realInput.focus();
+        }
+    }
+
+    realInput.addEventListener('input', (e) => {
+        if (!isPlaying) return;
+
+        let inputVal = realInput.value;
+        if (!inputVal) return;
+        
+        // Reset input element value so it captures character by character cleanly
+        realInput.value = '';
+
+        const spans = wordDisplay.querySelectorAll('span');
+
+        for (let i = 0; i < inputVal.length; i++) {
+            let char = inputVal[i];
+            if (charIndex < spans.length) {
+                typedCharacters++;
+                if (char === generatedText[charIndex]) {
+                    spans[charIndex].classList.add('correct');
+                    spans[charIndex].classList.remove('incorrect');
+                } else {
+                    mistakes++;
+                    spans[charIndex].classList.add('incorrect');
+                    spans[charIndex].classList.remove('correct');
+                }
+                charIndex++;
+            }
+        }
+
+        highlightCurrent();
+        calculateMetrics();
+
+        // Auto-refresh text chunk if user is nearing the end
+        if (charIndex >= spans.length - 15) {
+            appendMoreText();
+        }
+    });
+
+    function appendMoreText() {
+        let shuffled = [...wordList].sort(() => Math.random() - 0.5);
+        let extraText = " " + shuffled.join(" ");
+        generatedText += extraText;
+        
+        extraText.split("").forEach(char => {
+            let span = document.createElement('span');
+            span.textContent = char;
+            wordDisplay.appendChild(span);
+        });
+    }
+
+    function calculateMetrics() {
+        let timeElapsed = testDuration - timeLeft;
+        if (timeElapsed === 0) timeElapsed = 1;
+
+        // WPM calculation: (correct characters / 5) / minutes
+        let correctChars = typedCharacters - mistakes;
+        let wpm = Math.round((correctChars / 5) / (timeElapsed / 60));
+        wpmDisplay.textContent = wpm < 0 ? 0 : wpm;
+
+        // Accuracy calculation
+        let accuracy = 100;
+        if (typedCharacters > 0) {
+            accuracy = Math.round(((typedCharacters - mistakes) / typedCharacters) * 100);
+        }
+        accuracyDisplay.textContent = (accuracy < 0 ? 0 : accuracy) + '%';
+    }
+
+    function updateTimer() {
+        if (timeLeft > 0) {
+            timeLeft--;
+            timerDisplay.textContent = timeLeft;
+            calculateMetrics();
+        } else {
+            endGame();
+        }
+    }
+
+    function endGame() {
+        isPlaying = false;
+        clearInterval(timerInterval);
+        
+        let finalWpm = wpmDisplay.textContent;
+        let finalAcc = accuracyDisplay.textContent;
+        
+        finalStatsText.innerHTML = `You typed at <b>${finalWpm} WPM</b> with <b>${finalAcc}</b> accuracy.`;
+        resultsOverlay.classList.remove('hidden');
+    }
+
+    function resetGame() {
+        resultsOverlay.classList.add('hidden');
+        startOverlay.classList.remove('hidden');
+    }
+
+    // Initialize display state on load
+    initText();
+</script>
+
+</body>
+</html>
