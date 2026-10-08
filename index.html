@@ -7,34 +7,34 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #111113;
-            --card-bg: #18181b;
-            --text-color: #71717a;
-            --text-active: #f4f4f5;
-            --accent-color: #f59e0b;
-            --error-color: #ef4444;
-            --error-bg: rgba(239, 68, 68, 0.15);
+            --bg-color: #141619;
+            --text-color: #646669;
+            --sub-color: #8f9398;
+            --main-color: #e2b714;
+            --error-color: #ca4754;
+            --error-extra: #7e2a33;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            font-family: 'Roboto Mono', monospace;
         }
 
         body {
-            font-family: 'Roboto Mono', monospace;
             background-color: var(--bg-color);
             color: var(--text-color);
-            min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
-            padding: 40px;
+            min-height: 100vh;
+            padding: 2rem;
+            overflow-x: hidden;
         }
 
-        header {
+        header, footer {
             width: 100%;
             max-width: 900px;
             display: flex;
@@ -43,30 +43,29 @@
         }
 
         .logo {
-            font-size: 20px;
+            font-size: 1.4rem;
             font-weight: 700;
-            color: var(--text-active);
+            color: var(--sub-color);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 0.5r em;
         }
 
-        .logo span {
-            color: var(--accent-color);
-        }
+        .logo span { color: var(--main-color); }
 
-        .modes-bar {
+        /* Modes bar */
+        .modes {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 0.4rem 1rem;
+            border-radius: 6px;
             display: flex;
-            background: var(--card-bg);
-            padding: 6px 12px;
-            border-radius: 8px;
-            gap: 12px;
-            font-size: 14px;
+            gap: 1rem;
+            font-size: 0.9rem;
         }
 
         .mode-group {
             display: flex;
-            gap: 8px;
+            gap: 0.6rem;
         }
 
         .mode-btn {
@@ -74,50 +73,53 @@
             border: none;
             color: var(--text-color);
             cursor: pointer;
-            font-family: inherit;
-            font-size: 13px;
             transition: color 0.2s;
         }
 
         .mode-btn:hover, .mode-btn.active {
-            color: var(--accent-color);
+            color: var(--main-color);
         }
 
-        .divider {
-            color: #3f3f46;
+        .separator {
+            color: rgba(255, 255, 255, 0.1);
         }
 
-        main {
+        /* Main Game Area */
+        .container {
             width: 100%;
             max-width: 900px;
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-        }
-
-        .live-stats {
-            display: flex;
-            gap: 20px;
-            font-size: 20px;
-            color: var(--accent-color);
-            height: 30px;
-        }
-
-        .typing-container {
             position: relative;
-            font-size: 24px;
-            line-height: 2.2;
-            height: 130px;
+        }
+
+        #stats-bar {
+            font-size: 1.8rem;
+            color: var(--main-color);
+            margin-bottom: 1rem;
+            height: 2rem;
+        }
+
+        .word-wrapper {
+            position: relative;
+            font-size: 1.5rem;
+            line-height: 2.4rem;
+            height: 7.2rem;
             overflow: hidden;
             user-select: none;
             outline: none;
         }
 
-        /* Word and character layout wrapper */
+        .words {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem 0.6rem;
+            position: relative;
+            top: 0;
+            transition: top 0.15s ease;
+        }
+
         .word {
-            display: inline-block;
-            margin-right: 12px;
-            white-space: nowrap;
+            position: relative;
+            border-bottom: 2px solid transparent;
         }
 
         .letter {
@@ -125,25 +127,21 @@
             transition: color 0.1s ease;
         }
 
-        .letter.correct {
-            color: var(--text-active);
+        .letter.correct { color: #d1d0c5; }
+        .letter.incorrect { 
+            color: var(--error-color); 
+            border-bottom: 1px solid var(--error-color);
         }
+        .letter.extra { color: var(--error-extra); }
 
-        .letter.incorrect {
-            color: var(--error-color);
-            background-color: var(--error-bg);
-            border-radius: 2px;
-        }
-
-        /* Blinking cursor simulation */
-        .letter.current-cursor::before {
-            content: '';
+        /* Smooth Gliding Caret */
+        #cursor {
             position: absolute;
-            left: 0;
-            top: 15%;
-            height: 70%;
+            background-color: var(--main-color);
             width: 2px;
-            background-color: var(--accent-color);
+            height: 1.8rem;
+            top: 0.3rem;
+            transition: left 0.05s ease, top 0.05s ease;
             animation: blink 1s infinite;
         }
 
@@ -152,78 +150,106 @@
             50% { opacity: 0; }
         }
 
-        .restart-prompt {
+        /* Controls & Reset */
+        .controls {
+            margin-top: 2rem;
             display: flex;
             justify-content: center;
-            margin-top: 20px;
+            align-items: center;
         }
 
-        .icon-btn {
-            background: var(--card-bg);
+        .reset-btn {
+            background: none;
             border: none;
             color: var(--text-color);
-            padding: 10px 20px;
-            border-radius: 8px;
             cursor: pointer;
-            font-family: inherit;
-            font-size: 14px;
+            font-size: 0.9rem;
             display: flex;
             align-items: center;
-            gap: 8px;
-            transition: background 0.2s, color 0.2s;
+            gap: 0.4rem;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.03);
+            transition: all 0.2s;
         }
 
-        .icon-btn:hover {
-            background: #27272a;
-            color: var(--text-active);
+        .reset-btn:hover {
+            color: #d1d0c5;
+            background: rgba(255, 255, 255, 0.07);
         }
 
-        /* Results Screen View */
-        .results-card {
+        /* Results Modal Overlay */
+        #results-modal {
             display: none;
-            background: var(--card-bg);
-            padding: 40px;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(20, 22, 25, 0.92);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .results-content {
+            background: #1b1e23;
+            padding: 2.5rem;
             border-radius: 12px;
-            text-align: center;
-            animation: fadeIn 0.3s ease;
+            width: 500px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-align: left;
+            border: 1px solid rgba(255,255,255,0.05);
         }
 
-        .results-card.active {
-            display: block;
+        .results-content h2 {
+            color: var(--sub-color);
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .results-grid {
+        .main-stats {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-box .label {
+            font-size: 0.9rem;
+            color: var(--text-color);
+        }
+
+        .stat-box .value {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--main-color);
+        }
+
+        .sub-stats {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin: 30px 0;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            font-size: 0.85rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 1rem 0;
         }
 
-        .result-box .label {
-            font-size: 14px;
-            margin-bottom: 5px;
-        }
-
-        .result-box .value {
-            font-size: 42px;
+        .sub-stat-item span {
+            display: block;
             font-weight: 700;
-            color: var(--text-active);
+            color: #d1d0c5;
+            font-size: 1.1rem;
         }
 
-        .result-box.highlight .value {
-            color: var(--accent-color);
+        .restart-prompt {
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--sub-color);
         }
 
         footer {
-            font-size: 13px;
-            color: #52525b;
-        }
-
-        footer kbd {
-            background: var(--card-bg);
-            padding: 2px 6px;
-            border-radius: 4px;
-            border: 1px solid #3f3f46;
+            font-size: 0.8rem;
             color: var(--text-color);
         }
     </style>
@@ -231,264 +257,354 @@
 <body>
 
     <header>
-        <div class="logo">⚡ Type<span>Flow</span></div>
-        <div class="modes-bar">
-            <div class="mode-group" id="time-modes">
-                <button class="mode-btn" data-time="15">15</button>
-                <button class="mode-btn active" data-time="30">30</button>
-                <button class="mode-btn" data-time="60">60</button>
+        <div class="logo">⚡ <span>Type</span>Flow</div>
+        <div class="modes">
+            <div class="mode-group" id="mode-type">
+                <button class="mode-btn active" data-mode="time" data-val="15">15</button>
+                <button class="mode-btn" data-mode="time" data-val="30">30</button>
+                <button class="mode-btn" data-mode="time" data-val="60">60</button>
             </div>
-            <span class="divider">/</span>
-            <div class="mode-group" id="word-modes">
-                <button class="mode-btn" data-words="10">10w</button>
-                <button class="mode-btn" data-words="25">25w</button>
+            <div class="separator">/</div>
+            <div class="mode-group" id="mode-count">
+                <button class="mode-btn" data-mode="words" data-val="10">10w</button>
+                <button class="mode-btn" data-mode="words" data-val="25">25w</button>
             </div>
         </div>
     </header>
 
-    <main>
-        <div id="game-section">
-            <div class="live-stats">
-                <div id="timer-display">30</div>
-            </div>
-            <!-- tabindex makes the custom container naturally focusable via JS -->
-            <div class="typing-container" id="typing-container" tabindex="0">
-                <div id="words-wrapper"></div>
-            </div>
-            <div class="restart-prompt">
-                <button class="icon-btn" onclick="initGame()">
-                    ↻ Reset <kbd>Tab</kbd>
-                </button>
-            </div>
+    <div class="container">
+        <div id="stats-bar">30</div>
+        <div class="word-wrapper" id="word-wrapper" tabindex="0">
+            <div id="cursor"></div>
+            <div class="words" id="words"></div>
         </div>
+        
+        <div class="controls">
+            <button class="reset-btn" id="reset-btn">
+                ↻ Reset Test
+            </button>
+        </div>
+    </div>
 
-        <div class="results-card" id="results-card">
-            <h2>Test Complete</h2>
-            <div class="results-grid">
-                <div class="result-box highlight">
+    <!-- Results Modal -->
+    <div id="results-modal">
+        <div class="results-content">
+            <h2>Test Results <span id="pb-badge" style="color:var(--main-color); float:right;"></span></h2>
+            <div class="main-stats">
+                <div class="stat-box">
                     <div class="label">wpm</div>
                     <div class="value" id="res-wpm">0</div>
                 </div>
-                <div class="result-box">
+                <div class="stat-box">
                     <div class="label">acc</div>
-                    <div class="value" id="res-acc">0%</div>
-                </div>
-                <div class="result-box">
-                    <div class="label">characters</div>
-                    <div class="value" id="res-chars">0/0</div>
+                    <div class="value" id="res-acc" style="color: #d1d0c5;">0%</div>
                 </div>
             </div>
-            <button class="icon-btn" style="margin: 0 auto;" onclick="initGame()">Next Test ↻</button>
+            <div class="sub-stats">
+                <div class="sub-stat-item">characters <span id="res-chars">0/0/0/0</span></div>
+                <div class="sub-stat-item">time <span id="res-time">0s</span></div>
+                <div class="sub-stat-item">mode <span id="res-mode">30s</span></div>
+            </div>
+            <div class="restart-prompt">Press <b>Enter</b> or click anywhere to restart</div>
         </div>
-    </main>
+    </div>
 
     <footer>
-        Press <kbd>Tab</kbd> + <kbd>Enter</kbd> or click reset to restart anytime.
+        <div>Press <kbd>Tab</kbd> + <kbd>Enter</kbd> or click reset anytime.</div>
+        <div id="high-score-display">PB: 0 WPM</div>
     </footer>
 
     <script>
         const wordPool = [
-            "the", "be", "to", "of", "and", "a", "in", "that", "have", "i", 
-            "it", "for", "not", "on", "with", "he", "as", "you", "do", "at", 
-            "this", "but", "his", "by", "from", "they", "we", "say", "her", "she", 
-            "or", "an", "will", "my", "one", "all", "would", "there", "their", "what",
-            "code", "script", "function", "variable", "browser", "frontend", "backend",
-            "developer", "syntax", "framework", "network", "system", "algorithm", "database"
+            "frontend", "developer", "from", "their", "system", "framework", "function", 
+            "browser", "backend", "code", "script", "design", "layout", "element", 
+            "variable", "constant", "async", "promise", "network", "client", "server",
+            "storage", "database", "query", "interface", "package", "module", "router"
         ];
 
-        let testMode = 'time'; // 'time' or 'words'
-        let modeLimit = 30;   // 30 seconds or 25 words default
-        
-        let timer = null;
-        let timeLeft = 30;
-        let isStarted = false;
-        let isFinished = false;
+        let modeType = 'time'; // 'time' or 'words'
+        let modeValue = 30;
         
         let wordsList = [];
-        let cursorIndex = 0;
+        let wordIndex = 0;
+        let letterIndex = 0;
+        let timer = null;
+        let timeLeft = 30;
+        let timeElapsed = 0;
+        let isPlaying = false;
+        let isFinished = false;
+
         let correctCharsCount = 0;
         let incorrectCharsCount = 0;
+        let extraCharsCount = 0;
+        let missedCharsCount = 0;
         let totalTypedCount = 0;
 
-        const typingContainer = document.getElementById('typing-container');
-        const wordsWrapper = document.getElementById('words-wrapper');
-        const timerDisplay = document.getElementById('timer-display');
-        const gameSection = document.getElementById('game-section');
-        const resultsCard = document.getElementById('results-card');
+        const wordsContainer = document.getElementById('words');
+        const statsBar = document.getElementById('stats-bar');
+        const cursor = document.getElementById('cursor');
+        const wrapper = document.getElementById('word-wrapper');
+        const resetBtn = document.getElementById('reset-btn');
+        const resultsModal = document.getElementById('results-modal');
+        const highScoreDisplay = document.getElementById('high-score-display');
 
-        // Mode Switching Setup
-        document.querySelectorAll('.modes-bar button').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                document.querySelectorAll('.modes-bar button').forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active');
-                
-                if(e.target.dataset.time) {
-                    testMode = 'time';
-                    modeLimit = parseInt(e.target.dataset.time);
-                } else if(e.target.dataset.words) {
-                    testMode = 'words';
-                    modeLimit = parseInt(e.target.dataset.words);
-                }
-                initGame();
-            });
-        });
+        // Web Audio API Audio Clicks
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playClick(isError = false) {
+            try {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = isError ? 'sawtooth' : 'sine';
+                osc.frequency.setValueAtTime(isError ? 100 : 700, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.04);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.04);
+            } catch(e) {}
+        }
 
         function initGame() {
             clearInterval(timer);
-            isStarted = false;
+            isPlaying = false;
             isFinished = false;
-            cursorIndex = 0;
+            wordIndex = 0;
+            letterIndex = 0;
+            timeElapsed = 0;
             correctCharsCount = 0;
             incorrectCharsCount = 0;
+            extraCharsCount = 0;
+            missedCharsCount = 0;
             totalTypedCount = 0;
-            timeLeft = modeLimit;
+            
+            timeLeft = modeType === 'time' ? modeValue : 0;
+            statsBar.innerText = modeType === 'time' ? timeLeft : modeValue;
+            resultsModal.style.display = 'none';
 
-            timerDisplay.textContent = testMode === 'time' ? timeLeft : `-`;
-            gameSection.style.display = 'block';
-            resultsCard.classList.remove('active');
-
-            generateWords();
-            typingContainer.focus();
-        }
-
-        function generateWords() {
+            // Generate words
             wordsList = [];
-            let targetCount = testMode === 'time' ? 60 : modeLimit;
-            for(let i = 0; i < targetCount; i++) {
-                let randomWord = wordPool[Math.floor(Math.random() * wordPool.length)];
-                wordsList.push(randomWord);
+            const count = modeType === 'words' ? modeValue : 40;
+            for (let i = 0; i < count; i++) {
+                const randWord = wordPool[Math.floor(Math.random() * wordPool.length)];
+                wordsList.push(randWord);
             }
 
             renderWords();
+            updateCursorPosition();
+            wrapper.focus();
+            updateHighScoreDisplay();
         }
 
         function renderWords() {
-            wordsWrapper.innerHTML = '';
-            wordsList.forEach((word, wIdx) => {
-                let wordSpan = document.createElement('span');
-                wordSpan.className = 'word';
-                
-                for(let cIdx = 0; cIdx < word.length; cIdx++) {
-                    let letterSpan = document.createElement('span');
-                    letterSpan.className = 'letter';
-                    letterSpan.textContent = word[cIdx];
+            wordsContainer.innerHTML = '';
+            wordsList.forEach((word) => {
+                const wordSpan = document.createElement('div');
+                wordSpan.classList.add('word');
+                for (let char of word) {
+                    const letterSpan = document.createElement('span');
+                    letterSpan.classList.add('letter');
+                    letterSpan.innerText = char;
                     wordSpan.appendChild(letterSpan);
                 }
-                // Add a space element marker concept between words
-                if(wIdx < wordsList.length - 1) {
-                    let spaceSpan = document.createElement('span');
-                    spaceSpan.className = 'letter';
-                    spaceSpan.textContent = ' ';
-                    wordSpan.appendChild(spaceSpan);
-                }
-                wordsWrapper.appendChild(wordSpan);
+                wordsContainer.appendChild(wordSpan);
             });
-
-            updateCursorPosition();
         }
 
         function updateCursorPosition() {
-            const allLetters = wordsWrapper.querySelectorAll('.letter');
-            allLetters.forEach((l, idx) => {
-                l.classList.remove('current-cursor');
-                if(idx === cursorIndex) {
-                    l.classList.add('current-cursor');
-                }
-            });
+            const currentWordEl = wordsContainer.children[wordIndex];
+            if (!currentWordEl) return;
+            
+            if (letterIndex < currentWordEl.children.length) {
+                const currentLetterEl = currentWordEl.children[letterIndex];
+                cursor.style.left = currentLetterEl.offsetLeft + 'px';
+                cursor.style.top = currentWordEl.offsetTop + 'px';
+            } else {
+                const lastLetterEl = currentWordEl.children[currentWordEl.children.length - 1];
+                cursor.style.left = (lastLetterEl.offsetLeft + lastLetterEl.offsetWidth) + 'px';
+                cursor.style.top = currentWordEl.offsetTop + 'px';
+            }
         }
 
-        typingContainer.addEventListener('keydown', (e) => {
-            if(isFinished) return;
-
-            // Prevent default page jumps on spacebar
-            if(e.key === ' ' || e.key === 'Tab') {
-                e.preventDefault();
-            }
-
-            if(e.key === 'Tab') {
+        // Mode Switching
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                modeType = e.target.dataset.mode;
+                modeValue = parseInt(e.target.dataset.val);
                 initGame();
+            });
+        });
+
+        wrapper.addEventListener('click', () => wrapper.focus());
+
+        // Key Handling
+        wrapper.addEventListener('keydown', (e) => {
+            if (isFinished) {
+                if (e.key === 'Enter') initGame();
                 return;
             }
 
-            const allLetters = wordsWrapper.querySelectorAll('.letter');
+            if (!isPlaying && e.key.length === 1 && e.key !== ' ') {
+                isPlaying = true;
+                startTimer();
+            }
 
-            // Handle Backspace
-            if(e.key === 'Backspace') {
-                if(cursorIndex > 0) {
-                    cursorIndex--;
-                    allLetters[cursorIndex].classList.remove('correct', 'incorrect');
-                    updateCursorPosition();
+            const currentWordEl = wordsContainer.children[wordIndex];
+            if (!currentWordEl) return;
+
+            if (e.key === 'Backspace') {
+                playClick();
+                if (letterIndex > 0) {
+                    letterIndex--;
+                    const letterEl = currentWordEl.children[letterIndex];
+                    letterEl.classList.remove('correct', 'incorrect');
+                    if (letterEl.classList.contains('extra')) {
+                        letterEl.remove();
+                    }
+                } else if (wordIndex > 0) {
+                    wordIndex--;
+                    letterIndex = wordsContainer.children[wordIndex].children.length;
                 }
-                return;
-            }
+                updateCursorPosition();
+                e.preventDefault();
+            } 
+            else if (e.key === ' ') {
+                e.preventDefault();
+                if (letterIndex === 0 && wordIndex === 0) return; // Ignore leading spaces
+                
+                // Count unwritten letters as missed
+                for (let i = letterIndex; i < currentWordEl.children.length; i++) {
+                    missedCharsCount++;
+                }
 
-            // Capture valid printable character entries only
-            if(e.key.length === 1) {
-                if(!isStarted) {
-                    isStarted = true;
-                    if(testMode === 'time') {
-                        timer = setInterval(countDownTimer, 1000);
+                wordIndex++;
+                letterIndex = 0;
+
+                // Auto generate more words if running low in time mode
+                if (wordIndex >= wordsList.length - 5 && modeType === 'time') {
+                    for (let i = 0; i < 20; i++) {
+                        const randWord = wordPool[Math.floor(Math.random() * wordPool.length)];
+                        wordsList.push(randWord);
+                        const wordSpan = document.createElement('div');
+                        wordSpan.classList.add('word');
+                        for (let char of randWord) {
+                            const lSpan = document.createElement('span');
+                            lSpan.classList.add('letter');
+                            lSpan.innerText = char;
+                            wordSpan.appendChild(lSpan);
+                        }
+                        wordsContainer.appendChild(wordSpan);
                     }
                 }
 
-                if(cursorIndex < allLetters.length) {
-                    totalTypedCount++;
-                    let expectedChar = allLetters[cursorIndex].textContent;
-                    
-                    if(e.key === expectedChar) {
-                        allLetters[cursorIndex].classList.add('correct');
+                // Check finish condition for words mode
+                if (modeType === 'words' && wordIndex >= modeValue) {
+                    finishGame();
+                    return;
+                }
+
+                updateCursorPosition();
+                // Scroll container view if needed
+                if (currentWordEl.offsetTop > 40) {
+                    wordsContainer.style.top = `-${currentWordEl.offsetTop}px`;
+                }
+            } 
+            else if (e.key.length === 1) {
+                totalTypedCount++;
+                const expectedLetters = currentWordEl.children;
+
+                if (letterIndex < expectedLetters.length) {
+                    const letterEl = expectedLetters[letterIndex];
+                    if (e.key === letterEl.innerText) {
+                        letterEl.classList.add('correct');
                         correctCharsCount++;
+                        playClick(false);
                     } else {
-                        allLetters[cursorIndex].classList.add('incorrect');
+                        letterEl.classList.add('incorrect');
                         incorrectCharsCount++;
+                        playClick(true);
                     }
-
-                    cursorIndex++;
-                    updateCursorPosition();
-
-                    // Check if user completed all words in 'words' mode
-                    if(testMode === 'words' && cursorIndex >= allLetters.length) {
-                        finishGame();
-                    }
+                    letterIndex++;
+                } else {
+                    // Extra characters typed past word limit
+                    const extraSpan = document.createElement('span');
+                    extraSpan.classList.add('letter', 'extra');
+                    extraSpan.innerText = e.key;
+                    currentWordEl.appendChild(extraSpan);
+                    extraCharsCount++;
+                    letterIndex++;
+                    playClick(true);
                 }
+                updateCursorPosition();
             }
         });
 
-        function countDownTimer() {
-            if(timeLeft > 0) {
-                timeLeft--;
-                timerDisplay.textContent = timeLeft;
-            } else {
-                finishGame();
-            }
+        function startTimer() {
+            const startTime = Date.now();
+            timer = setInterval(() => {
+                const elapsedSec = Math.floor((Date.now() - startTime) / 1000);
+                timeElapsed = elapsedSec;
+
+                if (modeType === 'time') {
+                    timeLeft = modeValue - elapsedSec;
+                    statsBar.innerText = timeLeft > 0 ? timeLeft : 0;
+                    if (timeLeft <= 0) {
+                        clearInterval(timer);
+                        finishGame();
+                    }
+                } else {
+                    statsBar.innerText = elapsedSec;
+                }
+            }, 1000);
         }
 
         function finishGame() {
-            isFinished = false;
+            isFinished = true;
             clearInterval(timer);
-            gameSection.style.display = 'none';
-            resultsCard.classList.add('active');
 
-            // WPM formula: (correct characters / 5) / time in minutes
-            let timeSpentMinutes = (testMode === 'time' ? modeLimit : modeLimit) / 60; 
-            // Fallback active time metric safeguard
-            if(testMode === 'time' && timeLeft >= 0) {
-                timeSpentMinutes = (modeLimit - timeLeft) / 60;
-                if(timeSpentMinutes === 0) timeSpentMinutes = 0.01;
+            const finalTime = modeType === 'time' ? modeValue : (timeElapsed || 1);
+            const minutes = finalTime / 60;
+            const grossWpm = Math.round((totalTypedCount / 5) / minutes);
+            const netWpm = Math.max(0, Math.round(((correctCharsCount) / 5) / minutes));
+            const totalAttempts = correctCharsCount + incorrectCharsCount;
+            const accuracy = totalAttempts > 0 ? Math.round((correctCharsCount / totalAttempts) * 100) : 0;
+
+            // Display results in modal
+            document.getElementById('res-wpm').innerText = netWpm;
+            document.getElementById('res-acc').innerText = accuracy + '%';
+            document.getElementById('res-chars').innerText = `${correctCharsCount}/${incorrectCharsCount}/${extraCharsCount}/${missedCharsCount}`;
+            document.getElementById('res-time').innerText = finalTime + 's';
+            document.getElementById('res-mode').innerText = modeType === 'time' ? `${modeValue}s` : `${modeValue}w`;
+
+            // LocalStorage High Score Check
+            const storageKey = `typeflow_pb_${modeType}_${modeValue}`;
+            const currentPB = parseInt(localStorage.getItem(storageKey)) || 0;
+            const badge = document.getElementById('pb-badge');
+
+            if (netWpm > currentPB) {
+                localStorage.setItem(storageKey, netWpm);
+                badge.innerText = '★ NEW PB!';
+            } else {
+                badge.innerText = `PB: ${currentPB}`;
             }
 
-            let wpm = Math.round((correctCharsCount / 5) / timeSpentMinutes);
-            let accuracy = totalTypedCount > 0 ? Math.round((correctCharsCount / totalTypedCount) * 100) : 100;
-
-            document.getElementById('res-wpm').textContent = wpm < 0 ? 0 : wpm;
-            document.getElementById('res-acc').textContent = (accuracy < 0 ? 0 : accuracy) + '%';
-            document.getElementById('res-chars').textContent = `${correctCharsCount}/${incorrectCharsCount}`;
+            resultsModal.style.display = 'flex';
+            updateHighScoreDisplay();
         }
 
-        // Keep container focused
-        typingContainer.addEventListener('click', () => typingContainer.focus());
+        function updateHighScoreDisplay() {
+            const storageKey = `typeflow_pb_${modeType}_${modeValue}`;
+            const pb = localStorage.getItem(storageKey) || 0;
+            highScoreDisplay.innerText = `PB (${modeType === 'time' ? modeValue + 's' : modeValue + 'w'}): ${pb} WPM`;
+        }
 
-        // Initial setup boot
+        resetBtn.addEventListener('click', initGame);
+        resultsModal.addEventListener('click', initGame);
+
+        // Initial setup
         initGame();
     </script>
 </body>
